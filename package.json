@@ -1,0 +1,50 @@
+{
+  "name": "@kurenai-studio/enji",
+  "version": "0.1.0",
+  "description": "Enji — Creator 3.8 preview/edit workflow (no publish). Uses kurenai host with 3.8 meta downgrade.",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "bin": {
+    "enji": "bin/enji.mjs"
+  },
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/**/*",
+    "bin/**/*",
+    "templates/**/*",
+    "docs/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "test": "vitest run",
+    "check": "tsc --noEmit && npm run build && npm run test"
+  },
+  "keywords": [
+    "cocos",
+    "enji",
+    "creator-3.8",
+    "preview"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@kurenai-studio/kurenai": "file:../kurenai"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "tsdown": "^0.22.14",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
