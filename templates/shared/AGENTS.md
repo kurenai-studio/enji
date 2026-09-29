@@ -168,6 +168,6 @@ kurenai into a 3.8 project (kurenai would write 4.0-oriented defaults / publish)
 
 | Tool | Engine | Role |
 |------|--------|------|
-| Akane | Creator 2.x | reserved (not this package) |
+| Akane | — | reserved name, unassigned |
 | **Enji** | Creator **3.8** | preview / edit, no publish |
 | Kurenai | Creator 4.0 | full preview + publish |
