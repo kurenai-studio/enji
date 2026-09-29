@@ -120,6 +120,7 @@ for (const cam of scene.getComponentsInChildren(Camera)) {
     if (cam.node.name === 'PlayerCamera') continue;
     cam.clearFlags = Camera.ClearFlag.DEPTH_ONLY;
     cam.visibility = Layers.Enum.UI_2D;
+    cam.priority = 1 << 30; // the template camera's priority is 0, same as a new game camera
 }
 ```
 
