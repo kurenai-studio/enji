@@ -44,7 +44,7 @@ and both names in `includeModules`), then `enji host stop && enji host start`.
 Because render targets are 8-bit, a simulation that needs float state (height
 fields, velocities, particles) runs on the CPU in typed arrays and is uploaded
 into a float data texture every frame. A 256×256 grid is cheap in JavaScript: the `examples/pool-water` port of
-the three.js pool demo spends 3–9 ms per frame on it and runs at 52–60 FPS.
+the three.js pool demo spends 4.8 ms per frame on it on average (p95 6.9 ms) and runs at 59 FPS.
 Render passes are still useful for data that fits in 0–1 at 8 bits, such as
 caustics maps, blurs and baked lookups.
 
@@ -150,6 +150,16 @@ then shows up in `enji logs --errors` as one entry:
 `effectLine` is the line in your `.effect` file. It is missing when the error
 is in an included chunk; `source` then shows the generated line. Fix the file;
 the watcher re-imports it and the page reloads.
+
+### Shared chunks
+
+Put shared GLSL in `.chunk` files and include them from the effect with a path
+relative to the effect: `#include "./chunks/common.chunk"`. A relative
+`#include` inside a chunk resolves against the including effect's folder, not
+the chunk's, so do not nest chunk includes; include every chunk the program
+needs directly from the effect, in dependency order. When an effect fails to
+import, `enji import` currently reports only `import failed`; check include
+paths first.
 
 ## Recipes
 
