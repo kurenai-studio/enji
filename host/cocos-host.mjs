@@ -27,6 +27,8 @@
  *        recent host output, including compile errors and forwarded browser logs;
  *        stack lines fold into their entry. errors=1 skips errors logged before the
  *        last successful preview boot (reported as `superseded`) unless all=1.
+ *        previewPage is none | connected | booted: whether any browser page has
+ *        reported since host start, so an empty error list can be trusted.
  *   GET  /__enji/asset?path=<abs or relative to project>
  *        refreshes the file, then returns asset-db's uuid / type / sub-assets
  *
@@ -87,12 +89,15 @@ const logBuffer = [];
 let logSeq = 0;
 // Seq of the last successful preview boot; errors logged before it were fixed by a later edit.
 let bootSeq = 0;
+// Seq of the last line forwarded from any browser page; 0 means no page has run since start.
+let browserSeq = 0;
 
 // Stack frames and Babel code frames belong to the entry above them.
 const CONTINUATION = /^\s+at\s|^\s*>?\s*\d+\s*\||^\s+\|/;
 const WARN_LINE = /^\s*WARN\b|\[Browser WARN\]|DeprecationWarning|\[DEP\d+\]|^\(Use `node --trace/;
 const ERROR_LINE = /^\s*ERROR\b|\[Browser ERROR\]|asset-error|refresh failed|\b\w*Error:|\bfail(ed|s)?\b/i;
 const BOOT_LINE = /\[Browser LOG\] Cocos game preview started/;
+const BROWSER_LINE = /\[Browser [A-Z]+\]/;
 
 function levelOf(line) {
   if (WARN_LINE.test(line)) return 'warn';
@@ -118,6 +123,7 @@ function captureOutput(stream) {
       }
       logSeq += 1;
       if (BOOT_LINE.test(line)) bootSeq = logSeq;
+      if (BROWSER_LINE.test(line)) browserSeq = logSeq;
       logBuffer.push({ seq: logSeq, at: new Date().toISOString(), level: levelOf(line), line: line.trim() });
       if (logBuffer.length > LOG_CAPACITY) logBuffer.shift();
     }
@@ -408,9 +414,14 @@ function registerRoutes() {
             }
             return true;
           });
+          const previewPage = bootSeq ? 'booted' : browserSeq ? 'connected' : 'none';
           res.json({
             ok: true,
             lastSeq: logSeq,
+            previewPage,
+            ...(previewPage === 'none'
+              ? { hint: `No preview page has run since host start; open or reload ${state.url} before trusting an empty result.` }
+              : {}),
             ...(bootSeq ? { lastBootSeq: bootSeq } : {}),
             ...(superseded ? { superseded } : {}),
             entries,

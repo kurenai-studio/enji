@@ -63,8 +63,12 @@ Engine modules (Spine, DragonBones, TiledMap, physics backend, …) come from
 Feature Cropping. The host reads it at start: after changing modules, run
 `enji host stop && enji host start`. Spine runs only the selected version
 (`spine-3.8` or `spine-4.2`); skeletons exported for the other version fail
-to load. The first page load after `host start` may not forward browser logs;
-reload once before trusting an empty `enji logs`.
+to load.
+
+An empty `enji logs --errors` only means “no errors” when `previewPage` is
+`booted`. `none` means no browser page has run since `host start` (not opened
+yet, or the tab is still showing a connection error from the restart): open or
+reload the preview URL and ask again.
 
 ## 3D scenes: cameras vs Canvas
 
