@@ -24,7 +24,12 @@ const IGNORED_WORKSPACE_ENTRIES = new Set([
   ".idea",
 ]);
 
-export type EnjiTemplateId = "base-ai";
+export type EnjiTemplateId = "base-ai" | "base-3d";
+
+/** Templates stored as an overlay on another template. */
+const TEMPLATE_BASE: Partial<Record<EnjiTemplateId, EnjiTemplateId>> = {
+  "base-3d": "base-ai",
+};
 
 /** Resolve package root whether running from `src/` or bundled `lib/`. */
 function packageRoot(): string {
@@ -111,9 +116,11 @@ export class EnjiProjectControl {
         `Enji init requires an empty directory; found: ${projectEntries.join(", ")}`,
       );
     }
-    if (template !== "base-ai") {
-      throw new Error(`Unknown template "${template}"; use base-ai`);
+    if (template !== "base-ai" && template !== "base-3d") {
+      throw new Error(`Unknown template "${template}"; use base-ai or base-3d`);
     }
+    const base = TEMPLATE_BASE[template];
+    if (base) await copyDirectoryContents(templateDir(base), target);
     await copyDirectoryContents(templateDir(template), target);
     await copyDirectoryContents(sharedDir(), target);
     await assignProjectIdentity(target);

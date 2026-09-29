@@ -29,7 +29,10 @@
  *        last successful preview boot (reported as `superseded`) unless all=1.
  *        previewPage is none | connected | booted: whether any browser page has
  *        reported since host start. With errors=1, clean is true only when a page
- *        booted and no current errors remain.
+ *        booted and no current errors remain. Stack frames in preview chunks are
+ *        mapped to assets/*.ts (entry.source = first mapped frame); a shader compile
+ *        failure is one entry whose `shader` field points at the .effect lines;
+ *        browser entries carry `page` (one number per connected preview page).
  *   GET  /__enji/asset?path=<abs or relative to project>[&refresh=0]
  *        refreshes the file (unless refresh=0), then returns asset-db's uuid / type / sub-assets
  *
@@ -93,17 +96,132 @@ let bootSeq = 0;
 // Seq of the last line forwarded from any browser page; 0 means no page has run since start.
 let browserSeq = 0;
 
+// Preview page that is printing right now (set around each forwarded browser line).
+let currentPage = 0;
+let pageSeq = 0;
+const openPages = new Set();
+
 // Stack frames and Babel code frames belong to the entry above them.
 const CONTINUATION = /^\s+at\s|^\s*>?\s*\d+\s*\||^\s+\|/;
 const WARN_LINE = /^\s*WARN\b|\[Browser WARN\]|DeprecationWarning|\[DEP\d+\]|^\(Use `node --trace/;
 const ERROR_LINE = /^\s*ERROR\b|\[Browser ERROR\]|asset-error|refresh failed|\b\w*Error:|\bfail(ed|s)?\b/i;
 const BOOT_LINE = /\[Browser LOG\] Cocos game preview started/;
 const BROWSER_LINE = /\[Browser [A-Z]+\]/;
+const SHADER_FAIL = /\[Browser ERROR\] (\w+)Shader in '([^']+)' compilation failed/;
+const SHADER_DUMP_HEADER = /Shader source dump:/;
+const SHADER_DUMP_LINE = /^(\d+)(?: (.*))?$/;
+const GLSL_ERROR = /ERROR: \d+:(\d+): (.*)$/;
+const CHUNK_FRAME = /(https?:\/\/[^/\s]+\/chunks\/([0-9a-f]{2})\/([0-9a-f]+)\.js):(\d+):(\d+)/;
 
 function levelOf(line) {
   if (WARN_LINE.test(line)) return 'warn';
   return ERROR_LINE.test(line) ? 'error' : 'info';
 }
+
+const chunkMaps = new Map();
+
+/** Maps a preview chunk position back to the project source via packer-driver's source map. */
+function mapChunkPosition(dir, hash, line, column) {
+  const mapFile = join(project, 'temp/programming/packer-driver/targets/preview/chunks', dir, `${hash}.js.map`);
+  let tracer = chunkMaps.get(mapFile);
+  if (tracer === undefined) {
+    tracer = null;
+    try {
+      const { TraceMap } = cliRequire('@jridgewell/trace-mapping');
+      tracer = new TraceMap(readFileSync(mapFile, 'utf8'));
+    } catch {
+      // no map for this chunk
+    }
+    if (chunkMaps.size > 200) chunkMaps.clear();
+    chunkMaps.set(mapFile, tracer);
+  }
+  if (!tracer) return undefined;
+  const { originalPositionFor } = cliRequire('@jridgewell/trace-mapping');
+  const pos = originalPositionFor(tracer, { line, column: Math.max(0, column - 1) });
+  if (!pos.source || pos.line == null) return undefined;
+  const file = pos.source.startsWith('file://') ? fileURLToPath(pos.source) : pos.source;
+  return `${isAbsolute(file) ? relative(project, file) : file}:${pos.line}:${(pos.column ?? 0) + 1}`;
+}
+
+/** Rewrites a chunk URL in a stack frame to `assets/...ts:line:col`; returns the mapped location too. */
+function mapFrame(line) {
+  const match = CHUNK_FRAME.exec(line);
+  if (!match) return { line };
+  const location = mapChunkPosition(match[2], match[3], Number(match[4]), Number(match[5]));
+  return location ? { line: line.replace(match[0], location), location } : { line };
+}
+
+/** Finds `source` inside the CCProgram block of an .effect file; returns its 1-based line. */
+function effectLineOf(effectFile, program, source) {
+  const wanted = source?.trim();
+  if (!wanted || !effectFile) return undefined;
+  let lines;
+  try {
+    lines = readFileSync(effectFile, 'utf8').split('\n');
+  } catch {
+    return undefined;
+  }
+  let inside = !program;
+  for (let i = 0; i < lines.length; i++) {
+    const text = lines[i].trim();
+    if (program && /^CCProgram\s/.test(text)) inside = text.split(/\s+/)[1] === program;
+    else if (inside && text === wanted) return i + 1;
+  }
+  return undefined;
+}
+
+function effectFileOf(name) {
+  const candidate = `${resolve(assetsDir, 'effects', name)}.effect`;
+  if (existsSync(candidate)) return candidate;
+  const base = `${name.split('/').pop()}.effect`;
+  const search = (dir) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.name.startsWith('.')) continue;
+      const path = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        const found = search(path);
+        if (found) return found;
+      } else if (entry.name === base) return path;
+    }
+    return undefined;
+  };
+  try {
+    return search(assetsDir);
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Folds a browser shader failure (header, numbered source dump, GLSL errors) into
+ * its header entry, pointing each error at the .effect line it came from.
+ */
+function finishShaderBlock(block) {
+  const [effectName, ...programs] = block.program.split('|');
+  const stageKey = block.stage === 'Vertex' ? 'vs' : block.stage === 'Fragment' ? 'fs' : 'cs';
+  const program = programs.map((p) => p.split(':')[0]).find((p) => p === stageKey || p.startsWith(stageKey));
+  const effectFile = effectFileOf(effectName);
+  const effectPath = effectFile ? relative(project, effectFile) : `${effectName}.effect`;
+  // GLSL ES 3.00 sources start with a #version line that the dump leaves out.
+  const dump = block.dump;
+  const es3 = !dump[1]?.startsWith('#version') && dump.some((text) => /\blayout\s*\(|^\s*(in|out)\s/.test(text ?? ''));
+  const offset = es3 ? 1 : 0;
+  const errors = block.errors.map(({ glslLine, message }) => {
+    const source = dump[glslLine - offset];
+    const effectLine = effectLineOf(effectFile, program, source);
+    return { ...(effectLine ? { effectLine } : {}), glslLine, message, ...(source ? { source: source.trim() } : {}) };
+  });
+  const first = errors[0];
+  const where = first?.effectLine ? `${effectPath}:${first.effectLine}` : effectPath;
+  const entry = block.entry;
+  entry.line = `[Browser ERROR] shader compile failed: ${where} (${program ?? stageKey}) ${first?.message ?? ''}`.trim();
+  entry.shader = { effect: effectPath, program: program ?? stageKey, errors };
+  entry.detail = errors.map(
+    (e) => `  ${e.effectLine ? `${effectPath}:${e.effectLine}` : `glsl line ${e.glslLine}`} | ${e.source ?? ''}  <- ${e.message}`,
+  );
+}
+
+let shaderBlock;
 
 /** Keeps the last LOG_CAPACITY entries (host, compiler and forwarded browser logs). */
 function captureOutput(stream) {
@@ -113,20 +231,50 @@ function captureOutput(stream) {
     const text = partial + (typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString('utf8'));
     const lines = text.split('\n');
     partial = lines.pop() ?? '';
-    for (const line of lines) {
-      if (!line.trim()) continue;
+    for (const raw of lines) {
+      const line = raw.replace(/\0/g, '');
+      if (!line.trim()) {
+        // The shader dump ends with the source's NUL terminator; plain blank lines are logger padding.
+        if (shaderBlock && raw.includes('\0')) {
+          finishShaderBlock(shaderBlock);
+          shaderBlock = undefined;
+        }
+        continue;
+      }
+      if (shaderBlock) {
+        const body = line.replace(/^.*\[Browser ERROR\]\s*/, '').trimStart();
+        if (SHADER_DUMP_HEADER.test(line)) continue;
+        const glsl = GLSL_ERROR.exec(body);
+        if (glsl) {
+          shaderBlock.errors.push({ glslLine: Number(glsl[1]), message: glsl[2] });
+          continue;
+        }
+        const numbered = !shaderBlock.errors.length && SHADER_DUMP_LINE.exec(body);
+        if (numbered) {
+          shaderBlock.dump[Number(numbered[1])] = numbered[2] ?? '';
+          continue;
+        }
+        finishShaderBlock(shaderBlock);
+        shaderBlock = undefined;
+      }
       const last = logBuffer[logBuffer.length - 1];
       if (last && CONTINUATION.test(line)) {
+        const frame = mapFrame(line.trimEnd());
+        if (frame.location && !last.source) last.source = frame.location;
         last.detail ??= [];
-        if (last.detail.length < DETAIL_LINES) last.detail.push(line.trimEnd());
+        if (last.detail.length < DETAIL_LINES) last.detail.push(frame.line);
         else last.omitted = (last.omitted ?? 0) + 1;
         continue;
       }
       logSeq += 1;
       if (BOOT_LINE.test(line)) bootSeq = logSeq;
       if (BROWSER_LINE.test(line)) browserSeq = logSeq;
-      logBuffer.push({ seq: logSeq, at: new Date().toISOString(), level: levelOf(line), line: line.trim() });
+      const entry = { seq: logSeq, at: new Date().toISOString(), level: levelOf(line), line: mapFrame(line.trim()).line };
+      if (currentPage && BROWSER_LINE.test(line)) entry.page = currentPage;
+      logBuffer.push(entry);
       if (logBuffer.length > LOG_CAPACITY) logBuffer.shift();
+      const shader = SHADER_FAIL.exec(line);
+      if (shader) shaderBlock = { entry, stage: shader[1], program: shader[2], dump: [], errors: [] };
     }
     return write(chunk, ...rest);
   };
@@ -380,6 +528,89 @@ function clearStaleProgrammingLocks() {
   if (removed) log(`cleared ${removed} stale lock file(s) under temp/programming`);
 }
 
+// Replaces cocos-cli's injected console forwarder: queues messages until the socket
+// opens (first-load logs), forwards Error stacks and resource load failures.
+const CONSOLE_BRIDGE = `
+<script>
+(function () {
+  var queue = [], open = false, ws;
+  function fmt(a) {
+    if (a instanceof Error) return a.stack || String(a);
+    if (a && typeof a === 'object') { try { return JSON.stringify(a, null, 2); } catch (e) { return String(a); } }
+    return String(a);
+  }
+  function send(level, args) {
+    var msg = JSON.stringify({ type: 'log', level: level, message: Array.prototype.map.call(args, fmt).join(' ') });
+    if (open) ws.send(msg); else if (queue.length < 500) queue.push(msg);
+  }
+  ws = new WebSocket((location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + location.host + '/console-log');
+  ws.onopen = function () { open = true; queue.splice(0).forEach(function (m) { ws.send(m); }); };
+  ws.onclose = function () { open = false; };
+  ['log', 'error', 'warn', 'info', 'debug'].forEach(function (level) {
+    var original = console[level];
+    console[level] = function () { original.apply(console, arguments); send(level, arguments); };
+  });
+  window.addEventListener('error', function (e) {
+    var t = e.target;
+    if (t && t !== window && (t.src || t.href)) send('error', ['Failed to load resource: ' + (t.src || t.href)]);
+    else if (e.error && e.error.stack) send('error', ['Uncaught ' + e.error.stack]);
+    else send('error', ['Uncaught ' + e.message + ' (' + e.filename + ':' + e.lineno + ':' + e.colno + ')']);
+  }, true);
+  window.addEventListener('unhandledrejection', function (e) {
+    var r = e.reason;
+    send('error', ['Unhandled Promise Rejection: ' + (r && r.stack ? r.stack : String(r))]);
+  });
+})();
+</script>
+`;
+const STOCK_BRIDGE = /<script>\s*\(function\(\) \{\s*\/\/ 建立 WebSocket 连接[\s\S]*?<\/script>\s*/g;
+
+function installConsoleBridge() {
+  const service = load('server/console-log').consoleLogService;
+  const { WebSocketServer } = cliRequire('ws');
+  const inject = service.injectMiddleware;
+  service.injectMiddleware = (req, res, next) => {
+    const send = res.send;
+    res.send = function (body) {
+      if (typeof body === 'string' && STOCK_BRIDGE.test(body)) {
+        let first = true;
+        body = body.replace(STOCK_BRIDGE, () => (first ? ((first = false), CONSOLE_BRIDGE) : ''));
+      }
+      STOCK_BRIDGE.lastIndex = 0;
+      return send.call(this, body);
+    };
+    inject(req, res, next);
+  };
+  service.startup = function (server) {
+    this.wss = new WebSocketServer({ noServer: true });
+    server.on('upgrade', (request, socket, head) => {
+      if (new URL(request.url || '', 'http://base').pathname !== '/console-log') return;
+      this.wss.handleUpgrade(request, socket, head, (ws) => this.wss.emit('connection', ws, request));
+    });
+    this.wss.on('connection', (ws) => {
+      const page = ++pageSeq;
+      openPages.add(page);
+      ws.on('close', () => openPages.delete(page));
+      ws.on('message', (message) => {
+        let data;
+        try {
+          data = JSON.parse(message.toString());
+        } catch {
+          return;
+        }
+        if (data?.type !== 'log') return;
+        const level = ['error', 'warn', 'info', 'debug'].includes(data.level) ? data.level : 'log';
+        currentPage = page;
+        try {
+          console[level](`[Browser ${level.toUpperCase()}] ${data.message ?? ''}`);
+        } finally {
+          currentPage = 0;
+        }
+      });
+    });
+  };
+}
+
 function registerRoutes() {
   const { middlewareService } = load('server/middleware');
   middlewareService.register('EnjiHost', {
@@ -400,6 +631,10 @@ function registerRoutes() {
       {
         url: '/__enji/logs',
         async handler(req, res) {
+          if (shaderBlock) {
+            finishShaderBlock(shaderBlock);
+            shaderBlock = undefined;
+          }
           const since = Number(req.query.since || 0);
           const errorsOnly = req.query.errors === '1';
           const includeSuperseded = req.query.all === '1';
@@ -427,6 +662,10 @@ function registerRoutes() {
               : {}),
             ...(bootSeq ? { lastBootSeq: bootSeq } : {}),
             ...(superseded ? { superseded } : {}),
+            openPages: openPages.size,
+            ...(openPages.size > 1
+              ? { pagesHint: `${openPages.size} preview pages are open and all log here; each browser entry carries its page number. Close extra tabs if the output is confusing.` }
+              : {}),
             entries,
           });
         },
@@ -497,6 +736,7 @@ async function main() {
   log(`cocos-cli ${cliRoot}`);
   clearStaleProgrammingLocks();
   rmSync(derivedConfigFile, { force: true });
+  installConsoleBridge();
   registerRoutes();
 
   const { default: Launcher } = load('core/launcher');

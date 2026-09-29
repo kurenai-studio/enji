@@ -1,7 +1,7 @@
 import { existsSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 
-export const CLI_BOOLEAN_FLAGS = new Set(["errors", "all", "normalize-meta"]);
+export const CLI_BOOLEAN_FLAGS = new Set(["errors", "all", "normalize-meta", "3d"]);
 
 export type CliOptions = Record<string, string | true>;
 

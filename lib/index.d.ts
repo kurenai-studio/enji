@@ -138,7 +138,7 @@ declare function detectProject(projectPath: string): Promise<DetectedProject | u
 declare function assertEnjiProject(project: DetectedProject): void;
 //#endregion
 //#region src/project/control.d.ts
-type EnjiTemplateId = "base-ai";
+type EnjiTemplateId = "base-ai" | "base-3d";
 declare class EnjiProjectControl {
   inspect(projectPath: string): Promise<DetectedProject | undefined>;
   initialize(projectPath: string, template?: EnjiTemplateId): Promise<DetectedProject>;
