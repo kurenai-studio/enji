@@ -1,4 +1,5 @@
 import { createRequire } from "node:module";
+import { join } from "node:path";
 import { downgradeMetaContent } from "./downgrade.js";
 
 function maybeDowngrade(file: unknown, data: unknown): unknown {
@@ -22,6 +23,7 @@ type FsModule = {
     data: string | Buffer,
     options?: unknown,
   ) => void;
+  writeFile: (file: string | URL | Buffer, data: string | Buffer, ...rest: unknown[]) => void;
   promises: {
     writeFile: (
       file: string | URL | Buffer,
@@ -52,8 +54,15 @@ export function installMetaHooks(): void {
     return origWrite(file, maybeDowngrade(file, data) as never, options);
   }) as typeof fs.promises.writeFile;
 
+  const origWriteCb = fs.writeFile.bind(fs);
+  fs.writeFile = ((file, data, ...rest) => {
+    return origWriteCb(file, maybeDowngrade(file, data) as never, ...rest);
+  }) as typeof fs.writeFile;
+
   try {
-    const fsExtra = req("fs-extra") as {
+    const coreRoot = process.env.ENJI_COCOS_CORE_ROOT;
+    const coreReq = coreRoot ? createRequire(join(coreRoot, "package.json")) : req;
+    const fsExtra = coreReq("fs-extra") as {
       writeFileSync?: typeof fs.writeFileSync;
       outputFileSync?: (file: string, data: string | Buffer, options?: unknown) => void;
       writeFile?: (file: string, data: string | Buffer, options?: unknown) => Promise<void>;
@@ -84,7 +93,7 @@ export function installMetaHooks(): void {
       };
     }
   } catch {
-    // fs-extra may only resolve from kurenai's vendor tree after host boots
+    // fs-extra is optional: graceful-fs already captures the patched fs functions.
   }
 
   process.stderr.write("[enji-meta] write hooks installed (3.8 meta cap)\n");

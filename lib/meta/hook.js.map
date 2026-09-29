@@ -1,0 +1,1 @@
+{"version":3,"file":"hook.js","names":[],"sources":["../../src/meta/hook.ts"],"sourcesContent":["/**\n * Side-effect entry for `node --import ./lib/meta/hook.js`.\n * Installs fs write hooks before host/cocos-host.mjs loads asset-db.\n */\nimport { installMetaHooks } from \"./install-hooks.js\";\n\ninstallMetaHooks();\n"],"mappings":";;;;;;AAMA,iBAAiB"}

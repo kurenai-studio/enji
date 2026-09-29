@@ -88,22 +88,6 @@ async function assignProjectIdentity(projectPath: string): Promise<void> {
   await writeFile(pkgPath, `${JSON.stringify(pkg, null, 4)}\n`, "utf8");
 }
 
-export function resolveKurenaiPackageRoot(): string {
-  try {
-    return dirname(require.resolve("@kurenai-studio/kurenai/package.json"));
-  } catch {
-    const fallback = resolve(packageRoot(), "..", "kurenai");
-    if (existsSync(join(fallback, "package.json"))) return fallback;
-    throw new Error("Cannot find @kurenai-studio/kurenai; npm install in enji first");
-  }
-}
-
-export function resolveKurenaiBin(name: "kurenai" | "kurenai-cocos-host"): string {
-  const bin = join(resolveKurenaiPackageRoot(), "bin", `${name}.mjs`);
-  if (!existsSync(bin)) throw new Error(`kurenai bin missing: ${bin}`);
-  return bin;
-}
-
 export class EnjiProjectControl {
   async inspect(projectPath: string): Promise<DetectedProject | undefined> {
     return detectProject(projectPath);

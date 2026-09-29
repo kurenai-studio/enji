@@ -1,0 +1,326 @@
+'use strict';
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const events_1 = require("events");
+const findLast_1 = __importDefault(require("lodash/findLast"));
+const ObjectWalker = __importStar(require("../missing-reporter/object-walker"));
+const utils_1 = __importDefault(require("../../../base/utils"));
+const node_path_manager_1 = __importDefault(require("./node-path-manager"));
+const path_utils_1 = require("./path-utils");
+class NodeManager extends events_1.EventEmitter {
+    // 当前在场景树中的节点集合,包括在层级管理器中隐藏的
+    allow = false;
+    _map = {};
+    _parentChildren = new Map(); // 父节点UUID -> 子节点UUID集合
+    // 被删除节点集合,为了undo，编辑器不会把Node删除
+    // _recycle: { [index: string]: any } = {};
+    /**
+     * 新增一个节点，当引擎将一个节点添加到场景树中，同时会遍历子节点，递归的调用这个方法。
+     * @param uuid
+     * @param node
+     */
+    add(uuid, node) {
+        if (!this.allow) {
+            return;
+        }
+        const nameError = (0, path_utils_1.validateNodeName)(node.name);
+        if (nameError) {
+            console.warn(`Node: preserving legacy node name "${node.name}". ${nameError}`);
+        }
+        this._map[uuid] = node;
+        const parentUuid = node.parent ? node.parent.uuid : undefined;
+        // 生成唯一路径
+        node_path_manager_1.default.generateUniquePath(uuid, node.name, parentUuid);
+        // 维护父子关系
+        if (parentUuid) {
+            if (!this._parentChildren.has(parentUuid)) {
+                this._parentChildren.set(parentUuid, new Set());
+            }
+            this._parentChildren.get(parentUuid).add(uuid);
+        }
+        try {
+            this.emit('add', uuid, node);
+        }
+        catch (error) {
+            console.error(error);
+        }
+    }
+    /**
+     * 删除一个节点，当引擎将一个节点从场景树中移除，同时会遍历子节点，递归的调用这个方法。
+     * @param uuid
+     */
+    remove(uuid) {
+        if (!this.allow) {
+            return;
+        }
+        if (!this._map[uuid]) {
+            return;
+        }
+        const node = this._map[uuid];
+        const parentUuid = this._getParentUuid(uuid);
+        node_path_manager_1.default.remove(uuid, parentUuid);
+        // 清理父子关系
+        this._cleanupParentRelations(uuid);
+        // this._recycle[uuid] = this._map[uuid];
+        delete this._map[uuid];
+        try {
+            this.emit('remove', uuid, node);
+        }
+        catch (error) {
+            console.error(error);
+        }
+    }
+    /**
+     * 清空所有数据
+     */
+    clear() {
+        if (!this.allow) {
+            return;
+        }
+        this._map = {};
+        node_path_manager_1.default.clear();
+        this._parentChildren.clear();
+        // this._recycle = {};
+    }
+    /**
+     * Update node name and path.
+     * API entry points reject illegal names, but undo/redo may restore a legacy name directly.
+     * Preserve that display name and let NodePathManager sanitize only its system path segment.
+     */
+    updateNodeName(uuid, newName) {
+        if (!this._map[uuid]) {
+            return;
+        }
+        const error = (0, path_utils_1.validateNodeName)(newName);
+        if (error) {
+            console.warn(`Node: preserving legacy node name "${newName}". ${error}`);
+        }
+        const node = this._map[uuid];
+        // 获取父节点UUID
+        const parentUuid = this._getParentUuid(uuid);
+        node_path_manager_1.default.updateUuid(uuid, newName, parentUuid);
+        // 更新节点对象的名称
+        node.name = newName;
+    }
+    /**
+     * 更新节点父级关系，并同步该节点及其后代的路径索引。
+     */
+    updateNodeParent(uuid, newParentUuid) {
+        const node = this._map[uuid];
+        if (!node) {
+            return '';
+        }
+        const oldParentUuid = this._getParentUuid(uuid);
+        if (oldParentUuid === newParentUuid) {
+            return node_path_manager_1.default.getNodePath(uuid);
+        }
+        const newPath = node_path_manager_1.default.move(uuid, node.name, newParentUuid, oldParentUuid);
+        if (!newPath) {
+            return '';
+        }
+        if (oldParentUuid) {
+            const oldChildren = this._parentChildren.get(oldParentUuid);
+            oldChildren?.delete(uuid);
+        }
+        if (newParentUuid) {
+            if (!this._parentChildren.has(newParentUuid)) {
+                this._parentChildren.set(newParentUuid, new Set());
+            }
+            this._parentChildren.get(newParentUuid).add(uuid);
+        }
+        return newPath;
+    }
+    /**
+     * 获取一个节点数据，查的范围包括被删除的节点
+     * @param uuid
+     */
+    getNode(uuid) {
+        return this._map[uuid] ?? null;
+    }
+    getNodeByPath(path) {
+        const normalized = (0, path_utils_1.normalizeNodePath)(path);
+        if (normalized === '/') {
+            return cc.director.getScene() ?? null;
+        }
+        const result = node_path_manager_1.default.getNodeResult(normalized);
+        if (result.error === 'Ambiguous') {
+            throw new Error(`The path "${path}" is ambiguous. Multiple nodes found with case-insensitive match.`);
+        }
+        if (result.error === 'Not found') {
+            return null;
+        }
+        if (result.uuid) {
+            return this.getNode(result.uuid);
+        }
+        return null;
+    }
+    getNodePath(node) {
+        if (!node?.uuid) {
+            return '';
+        }
+        const path = node_path_manager_1.default.getNodePath(node.uuid);
+        if (!path) {
+            const scene = cc.director.getScene();
+            return node === scene ? '/' : '';
+        }
+        return path;
+    }
+    getNodeUuidByPath(path) {
+        const normalized = (0, path_utils_1.normalizeNodePath)(path);
+        if (normalized === '/') {
+            const scene = cc.director.getScene();
+            return scene ? scene.uuid : null;
+        }
+        const uuid = node_path_manager_1.default.getNodeUuid(normalized);
+        const node = uuid && this.getNode(uuid);
+        return node ? node.uuid : null;
+    }
+    getNodeByPathOrThrow(path) {
+        const node = this.getNodeByPath(path);
+        if (!node) {
+            throw new Error(`找不到路径为 '${path}' 的节点`);
+        }
+        return node;
+    }
+    getNodeUuidByPathOrThrow(nodePath) {
+        const nodeUuid = this.getNodeUuidByPath(nodePath);
+        if (!nodeUuid) {
+            throw new Error(`找不到路径为 "${nodePath}" 的节点`);
+        }
+        return nodeUuid;
+    }
+    /**
+     * 获取所有的节点数据
+     */
+    getNodes() {
+        return this._map;
+    }
+    /**
+     * 获取场景中使用了某个资源的节点
+     * @param uuid asset uuid
+     */
+    getNodesByAsset(uuid) {
+        const nodesUuid = [];
+        if (!uuid) {
+            return nodesUuid;
+        }
+        ObjectWalker.walkProperties(cc.director.getScene().children, (obj, key, value, parsedObjects) => {
+            let isAsset = false;
+            if (value._uuid) {
+                isAsset = value._uuid.includes(uuid) || utils_1.default.UUID.compressUUID(value._uuid, true).includes(uuid);
+            }
+            let isScript = false;
+            if (value.__scriptUuid) {
+                isScript = value.__scriptUuid.includes(uuid) || utils_1.default.UUID.compressUUID(value.__scriptUuid, false).includes(uuid);
+            }
+            if (isAsset || isScript) {
+                const node = (0, findLast_1.default)(parsedObjects, (item) => item instanceof cc.Node);
+                if (node && !nodesUuid.includes(node.uuid)) {
+                    nodesUuid.push(node.uuid);
+                }
+            }
+        }, {
+            dontSkipNull: false,
+            ignoreSubPrefabHelper: true,
+        });
+        return nodesUuid;
+    }
+    /**
+     * 获取所有在场景树中的节点数据
+     */
+    getNodesInScene() {
+        return this._map;
+    }
+    changeNodeUUID(oldUUID, newUUID) {
+        if (!newUUID || oldUUID === newUUID) {
+            return;
+        }
+        const node = this._map[oldUUID];
+        if (!node) {
+            return;
+        }
+        node._id = newUUID;
+        // 更新节点路径
+        node_path_manager_1.default.changeUuid(oldUUID, newUUID);
+        this._map[newUUID] = node;
+        delete this._map[oldUUID];
+        // 同步父子索引：替换父节点 children Set 中的旧 UUID
+        for (const [, children] of this._parentChildren) {
+            if (children.has(oldUUID)) {
+                children.delete(oldUUID);
+                children.add(newUUID);
+                break;
+            }
+        }
+        // 同步父子索引：如果本节点是父节点，将 key 迁移到新 UUID
+        const childSet = this._parentChildren.get(oldUUID);
+        if (childSet) {
+            this._parentChildren.delete(oldUUID);
+            this._parentChildren.set(newUUID, childSet);
+        }
+    }
+    /**
+    * 获取节点的父节点UUID
+    */
+    _getParentUuid(uuid) {
+        for (const [parentUuid, children] of this._parentChildren.entries()) {
+            if (children.has(uuid)) {
+                return parentUuid;
+            }
+        }
+    }
+    /**
+     * 清理父子关系
+     */
+    _cleanupParentRelations(uuid) {
+        // 从父节点中移除
+        const parentUuid = this._getParentUuid(uuid);
+        if (parentUuid) {
+            this._parentChildren.get(parentUuid)?.delete(uuid);
+        }
+        // 递归清理所有子节点
+        const children = this._parentChildren.get(uuid);
+        if (children) {
+            for (const childUuid of children) {
+                this.remove(childUuid);
+            }
+            this._parentChildren.delete(uuid);
+        }
+    }
+}
+exports.default = NodeManager;

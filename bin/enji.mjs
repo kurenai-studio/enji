@@ -15,10 +15,9 @@
 import { spawn } from 'node:child_process';
 import { closeSync, existsSync, mkdirSync, openSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { parseArgs, resolveProjectDir, wantsHelp } from '../lib/cli/parse.js';
 
-const HOST_ENTRY = join(dirname(fileURLToPath(import.meta.url)), 'enji-cocos-host.mjs');
+const META_HOOK = new URL('../lib/meta/hook.js', import.meta.url);
 const STOP_TIMEOUT_MS = 8_000;
 const POLL_MS = 500;
 
@@ -31,11 +30,11 @@ const USAGE = `usage:
   enji check [--project <dir>]
   enji context [--project <dir>]
 
-Enji is Creator 3.8 only. Preview uses the kurenai 4.0 host with 3.8 meta caps.
+Enji is Creator 3.8 only. Preview runs a bundled cocos runtime with 3.8 meta caps.
 There is no publish — build in Creator 3.8.8 IDE.
 
 host start waits for readiness (default 600s). Override with --timeout <seconds>
-or env KURENAI_HOST_READY_TIMEOUT_MS / ENJI_HOST_READY_TIMEOUT_MS.`;
+or env ENJI_HOST_READY_TIMEOUT_MS.`;
 
 function print(value) {
   process.stdout.write(`${JSON.stringify(value, null, 2)}\n`);
@@ -67,7 +66,7 @@ function alive(pid) {
 
 function readHostFile(project) {
   try {
-    const host = JSON.parse(readFileSync(join(project, 'temp', 'kurenai-host.json'), 'utf8'));
+    const host = JSON.parse(readFileSync(join(project, 'temp', 'enji-host.json'), 'utf8'));
     return alive(host.pid) ? host : undefined;
   } catch {
     return undefined;
@@ -76,7 +75,7 @@ function readHostFile(project) {
 
 async function hostStatus(host) {
   try {
-    const response = await fetch(`${host.serverUrl}/__kurenai/status`);
+    const response = await fetch(`${host.serverUrl}/__enji/status`);
     return response.ok ? await response.json() : undefined;
   } catch {
     return undefined;
@@ -92,31 +91,27 @@ function logTail(logFile, lines = 20) {
 }
 
 async function ensureHost(project, options = {}) {
-  const { resolveHostReadyTimeoutMs, ensureCorePack, resolveCocosCliRoot } = await import(
-    '@kurenai-studio/kurenai'
-  );
-  if (process.env.ENJI_HOST_READY_TIMEOUT_MS && !process.env.KURENAI_HOST_READY_TIMEOUT_MS) {
-    process.env.KURENAI_HOST_READY_TIMEOUT_MS = process.env.ENJI_HOST_READY_TIMEOUT_MS;
-  }
+  const { resolveHostReadyTimeoutMs, ensureCoreDeps, hostEntry } = await import('../lib/index.js');
   const readyTimeoutMs = resolveHostReadyTimeoutMs(options);
 
   const running = readHostFile(project);
   if (running && (await hostStatus(running))?.ready) return running;
 
-  const cocosCliRoot = resolveCocosCliRoot();
-  await ensureCorePack({ cocosCliRoot });
+  const { root: coreRoot } = await ensureCoreDeps();
 
   const logFile = join(project, 'temp', 'enji-host.log');
   if (!running) {
+    if (!existsSync(META_HOOK)) exitWith('missing lib/meta/hook.js — run `npm run build` in enji first');
     mkdirSync(dirname(logFile), { recursive: true });
     const out = openSync(logFile, 'w');
-    const child = spawn(process.execPath, ['--max-old-space-size=8192', HOST_ENTRY], {
+    const nodeArgs = ['--import', META_HOOK.href, '--max-old-space-size=8192', hostEntry()];
+    const child = spawn(process.execPath, nodeArgs, {
       cwd: project,
       env: {
         ...process.env,
         PROJECT: project,
         PORT: process.env.PORT || '7460',
-        KURENAI_COCOS_CLI_ROOT: cocosCliRoot,
+        ENJI_COCOS_CORE_ROOT: coreRoot,
         ENJI_META_DOWNGRADE: '1',
       },
       stdio: ['ignore', out, out],
@@ -137,7 +132,7 @@ async function ensureHost(project, options = {}) {
       return host;
     }
     const tail = logTail(logFile, 5);
-    if (!host && tail.some((line) => line.includes('[kurenai-host]') && /failed|not found|required/.test(line))) {
+    if (!host && tail.some((line) => line.includes('[enji-host]') && /failed|not found|required/.test(line))) {
       exitWith(`host failed to start:\n${logTail(logFile).join('\n')}`);
     }
   }
@@ -222,7 +217,7 @@ async function main() {
       ...(options.errors ? { errors: '1' } : {}),
       ...(options.all ? { all: '1' } : {}),
     });
-    print(await (await fetch(`${host.serverUrl}/__kurenai/logs?${query}`)).json());
+    print(await (await fetch(`${host.serverUrl}/__enji/logs?${query}`)).json());
     return;
   }
 
@@ -274,7 +269,7 @@ async function main() {
     const file = resolve(target);
     const project = resolveProject(options, file);
     const host = await ensureHost(project, options);
-    const response = await fetch(`${host.serverUrl}/__kurenai/asset?path=${encodeURIComponent(file)}`);
+    const response = await fetch(`${host.serverUrl}/__enji/asset?path=${encodeURIComponent(file)}`);
     const body = await response.json();
     // Cap metas again after asset-db refresh.
     const { normalizeProjectMetas } = await import('../lib/index.js');

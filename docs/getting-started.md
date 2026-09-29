@@ -8,7 +8,7 @@ tooling install and the feedback loop).
 
 Use **Enji** to develop / preview **Cocos Creator 3.8** projects.
 
-- Do **not** use kurenai as the primary CLI for 3.8 work.
+- Do **not** use kurenai for 3.8 work, and do not install it alongside Enji.
 - Do **not** install full cocos-cli / PinK.
 - Enji has **no** `publish`. Ship builds with the local **Creator 3.8.8 IDE**
   (or another build MCP).
@@ -16,29 +16,37 @@ Use **Enji** to develop / preview **Cocos Creator 3.8** projects.
 ## Environment
 
 - Node.js **22+**, npm, GitHub access
-- Sibling layout for local `file:` dependency on kurenai’s host:
-
-```text
-<workspace>/
-  kurenai/    # https://github.com/kurenai-studio/kurenai
-  enji/       # https://github.com/kurenai-studio/enji  (this repo)
-```
+- Nothing else. Enji is self-contained: the preview runtime is bundled in
+  `vendor/cocos-core`. Do **not** clone kurenai or cocos-cli next to it.
 
 ## Install
 
 ```sh
-git clone https://github.com/kurenai-studio/kurenai.git
-cd kurenai && npm install && npm run build
-
-cd ..
-git clone https://github.com/kurenai-studio/enji.git
-cd enji && npm install && npm run build && npm link
+git clone --depth 1 https://github.com/kurenai-studio/enji.git
+cd enji && npm install --omit=dev && npm link
 ```
+
+`lib/` is committed, so no build step is needed. `npm install` also installs the
+runtime's npm dependencies into `vendor/cocos-core/node_modules` (postinstall,
+about 80 MB download). If scripts were skipped (`--ignore-scripts`), run
+`node scripts/install-cocos-deps.mjs`; `enji host start` also does this on
+first run.
 
 Check: `enji --help`. Without link: `node <enji>/bin/enji.mjs --help`.
 
-Preview reuses the kurenai 4.0 host; **on-disk `.meta` is forced down to Creator
-3.8.8 gold**. Never hand-write `.meta`.
+**On-disk `.meta` is forced down to Creator 3.8.8 gold.** Never hand-write `.meta`.
+
+## Not covered by the bundled runtime
+
+The runtime is trimmed to what preview needs. These need the Creator 3.8.8 IDE:
+
+- Publishing / building (web, native, mini-games)
+- Legacy FBX importer (`userData.legacyFbxImporter`); the default FBX importer works
+- Converting PNG/JPG panoramas to HDR cubemaps
+- Lightmap baking and lightmap UV generation
+- Texture compression (ASTC / ETC / PVRTC)
+
+If an asset needs one of these, tell the user to open the project in Creator 3.8.8.
 
 ## Loop
 
@@ -68,7 +76,7 @@ Full authoring rules: project **`AGENTS.md`** (camera `clearFlags`, preview
 
 ## Checklist
 
-- [ ] `enji --help` works; the project uses enji, not kurenai as main CLI
+- [ ] `enji --help` works from a single enji clone (no kurenai checkout)
 - [ ] `enji host start` returns a preview URL; `enji logs --errors` stays clean
 - [ ] New assets keep 3.8-shaped `.meta` (no 4.0.x importer `ver`)
 - [ ] Shipping goes through Creator 3.8.8 IDE, not a publish subcommand

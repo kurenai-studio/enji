@@ -1,0 +1,338 @@
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.gamePreviewResourceRoutes = void 0;
+exports.getLibraryDirs = getLibraryDirs;
+const path_1 = require("path");
+const fs_1 = require("fs");
+const ejs_1 = __importDefault(require("ejs"));
+const global_1 = require("../../global");
+const scripting_routes_1 = require("./scripting-routes");
+const preview_settings_1 = require("./preview-settings");
+const live_reload_1 = require("./live-reload");
+const preview_toolbar_options_1 = require("./preview-toolbar-options");
+const i18n_1 = __importDefault(require("../base/i18n"));
+/**
+ * 各资源数据库的 library（已导入数据）目录缓存。
+ * 与编辑器 `queryOtherLibraryPath` 对齐：library 是扁平的 `<uuid前两位>/<uuid>.<ext>` 结构，
+ * 一个相对路径在所有 library 目录中唯一定位文件，因此 url 中的 bundle 段可忽略。
+ */
+let libraryDirsCache = null;
+async function getLibraryDirs() {
+    if (libraryDirsCache) {
+        return libraryDirsCache;
+    }
+    const { assetDBManager } = await Promise.resolve().then(() => __importStar(require('../assets')));
+    const dirs = Object.values(assetDBManager.assetDBInfo)
+        .map((info) => info.library)
+        .filter((v) => !!v);
+    libraryDirsCache = Array.from(new Set(dirs));
+    return libraryDirsCache;
+}
+/**
+ * 游戏运行时共享的资源路由（settings / 原始资源 / bundle config / bundle index / 启动场景 JSON）。
+ * 浏览器游戏预览（/）使用；抽出为具名导出便于维护。
+ */
+exports.gamePreviewResourceRoutes = [
+    {
+        // 运行时 settings：window._CCSettings = {...}
+        url: '/preview/settings.js',
+        async handler(req, res, next) {
+            try {
+                const startScene = typeof req.query.scene === 'string' ? req.query.scene : '';
+                const { settings } = await (0, preview_settings_1.getCachedPreviewSettings)(startScene);
+                if (!settings) {
+                    return next(new Error('Generate preview settings failed.'));
+                }
+                // 缩短启动屏时间，预览刷新更快
+                if (settings.splashScreen) {
+                    settings.splashScreen.totalTime = 50;
+                }
+                // settings 实时反映项目状态（启动场景 / jsList / 脚本映射），禁止缓存，
+                // 否则浏览器会复用旧 settings，出现“幽灵”插件/场景等问题。
+                res.set('Cache-Control', 'no-store');
+                res.type('application/javascript').send(`window._CCSettings = ${JSON.stringify(settings)};`);
+            }
+            catch (err) {
+                // 初始化未完成即请求预览：返回可重试的 503，让 IDE/浏览器稍后重试，
+                // 而不是返回缺 builtinAssets 的坏 settings 或裸 500。
+                if (err instanceof preview_settings_1.PreviewNotReadyError) {
+                    console.info(`[preview-settings Warning] not ready, ask client to retry (scene=${req.query.scene ?? ''})`);
+                    // 关键自愈触发点：确有预览页因未就绪而 boot 失败（settings.js 503）。据此标记待自愈，
+                    // 待 settings 首次真正可用时由 live-reload 广播 browser:reload 把该页刷新救回，无需手动刷新。
+                    // 以「确实发生过 503」为依据比依赖 socket 连接时序更可靠（规避异步就绪探测跨越初始化完成
+                    // 边界、标记 healed 却漏广播的竞态）。
+                    (0, live_reload_1.notePreviewNotReady)();
+                    res.set('Retry-After', '1');
+                    return res.status(503).type('text/plain').send('// Preview initializing, please retry.');
+                }
+                // 其它异常：显式打印真实堆栈，否则会被 express 错误中间件吞成裸 500，
+                // 表现为 "PhysicsSystem initDefaultMaterial Failed" / Graphics recompileShaders of null。
+                console.error(`[preview-settings] settings.js generation FAILED (scene=${req.query.scene ?? ''}):`, err);
+                next(err);
+            }
+        },
+    },
+    {
+        // bundle 的原始资源文件（import / native），从 asset-db library 目录读取
+        url: /^\/(?:remote|assets)\/[^/]+\/(?:import|native)\/(.*)/,
+        async handler(req, res, next) {
+            try {
+                const match = req.path.match(/^\/(?:remote|assets)\/[^/]+\/(?:import|native)\/(.*)/);
+                if (!match) {
+                    return next();
+                }
+                // 逐段 encode，兼容子资源 `@` 与含特殊字符的目录名（仅保留分隔符 / \ 与 @ 不编码）
+                const tail = match[1].replace(/[^\\/@]+/g, encodeURIComponent);
+                const dirs = await getLibraryDirs();
+                // 防目录穿越：join 后必须仍位于 library 目录内，否则跳过（`..` 会逃逸出目录）
+                let hit;
+                for (const d of dirs) {
+                    const full = (0, path_1.join)(d, tail);
+                    const rel = (0, path_1.relative)(d, full);
+                    if (rel.startsWith('..') || (0, path_1.isAbsolute)(rel)) {
+                        continue;
+                    }
+                    if ((0, fs_1.existsSync)(full)) {
+                        hit = full;
+                        break;
+                    }
+                }
+                if (!hit) {
+                    return next();
+                }
+                res.sendFile(hit, { dotfiles: 'allow' });
+            }
+            catch (err) {
+                next(err);
+            }
+        },
+    },
+    {
+        // bundle 配置 config.json / cc.config.json
+        url: /^\/(?:remote|assets)\/([^/]+)\/(?:config|cc\.config)\.json$/,
+        async handler(req, res, next) {
+            try {
+                const match = req.path.match(/^\/(?:remote|assets)\/([^/]+)\/(?:config|cc\.config)\.json$/);
+                if (!match) {
+                    return next();
+                }
+                const { bundleConfigs } = await (0, preview_settings_1.getCachedPreviewSettings)();
+                const config = bundleConfigs.find((c) => c.name === match[1]);
+                if (!config) {
+                    return next();
+                }
+                res.status(200).json(config);
+            }
+            catch (err) {
+                next(err);
+            }
+        },
+    },
+    {
+        // bundle 入口 index.js —— 预览下脚本由 QuickPack import-map 提供，这里只需一个空模块占位
+        url: /^\/(?:remote|assets)\/([^/]+)\/index\.js$/,
+        async handler(req, res, next) {
+            try {
+                const match = req.path.match(/^\/(?:remote|assets)\/([^/]+)\/index\.js$/);
+                if (!match) {
+                    return next();
+                }
+                const name = match[1];
+                const { bundleConfigs } = await (0, preview_settings_1.getCachedPreviewSettings)();
+                if (!bundleConfigs.find((c) => c.name === name)) {
+                    return next();
+                }
+                res.type('application/javascript').send(`System.register("virtual:///prerequisite-imports/${name}", [], function () {` +
+                    ` "use strict"; return { setters: [], execute: function () {} }; });`);
+            }
+            catch (err) {
+                next(err);
+            }
+        },
+    },
+    {
+        // 启动场景 JSON
+        url: /^\/scene\/(.+)\.json$/,
+        async handler(req, res, next) {
+            try {
+                const match = req.path.match(/^\/scene\/(.+)\.json$/);
+                if (!match) {
+                    return next();
+                }
+                let uuidOrUrl = match[1];
+                try {
+                    uuidOrUrl = decodeURIComponent(uuidOrUrl);
+                }
+                catch {
+                    // ignore
+                }
+                const { assetManager } = await Promise.resolve().then(() => __importStar(require('../assets')));
+                const info = assetManager.queryAssetInfo(uuidOrUrl);
+                const file = info?.library?.['.json'];
+                if (!file || !(0, fs_1.existsSync)(file)) {
+                    return next();
+                }
+                res.set('Cache-Control', 'no-store');
+                res.sendFile(file, { dotfiles: 'allow' });
+            }
+            catch (err) {
+                next(err);
+            }
+        },
+    },
+    {
+        /**
+         * 预览态类型化创建节点所需的「节点类型 → 内置 Prefab uuid」映射（只读）。
+         *
+         * 预览 iframe 里的 inspect agent（static/web/preview-inspect.js）在 Hierarchy 右键
+         * Create ▸ Cube / Button … 时需要这张表。这里**直接输出编辑态的 NODE_CONFIGS**，
+         * 而不是在前端 JS 里重抄一份，保证两侧的 uuid / canvasRequired / project-type 永不漂移。
+         *
+         * node-type-config 是无依赖的纯数据模块（不 import cc），可安全在 CLI 主进程加载。
+         * 注意必须注册在 `/scene/(.+).json` 之前也无妨——两者路径模式不重叠（本路由无 .json 后缀）。
+         */
+        url: '/scene/asset-meta',
+        async handler(req, res, next) {
+            try {
+                const dbURL = typeof req.query.dbURL === 'string' ? req.query.dbURL : '';
+                if (!dbURL) {
+                    return next();
+                }
+                const { assetManager } = await Promise.resolve().then(() => __importStar(require('../assets')));
+                const info = assetManager.queryAssetInfo(dbURL);
+                res.set('Cache-Control', 'no-store');
+                if (!info || info.isDirectory || !info.uuid) {
+                    res.status(404).json({ error: `asset not found: ${dbURL}` });
+                    return;
+                }
+                // subAssets 一并输出(一层):预览端创建 Sprite 节点时优先挂真子资产 SpriteFrame,
+                // 让 Inspector 的 spriteFrame 属性带资产 uuid、可索引回 Assets。
+                const subAssets = info.subAssets
+                    ? Object.values(info.subAssets).map(sub => ({ uuid: sub.uuid, type: sub.type, name: sub.name }))
+                    : [];
+                res.status(200).json({ uuid: info.uuid, type: info.type, name: info.name, subAssets });
+            }
+            catch (err) {
+                next(err);
+            }
+        },
+    },
+    {
+        /**
+         * 预览态「按资产拖拽创建节点」所需的「db:// URL → { uuid, type, name }」只读路由。
+         *
+         * Hierarchy 接受资产拖拽时（node.create-by-asset）只把 db:// URL 传进预览 iframe 的
+         * inspect agent（static/web/preview-inspect.js），而活场景加载/实例化需要 uuid 与类型：
+         * 这里在 CLI 主进程直接查 asset-db 返回最小字段，与 node-type-config 同属预览只读数据路由。
+         */
+        url: '/scene/node-type-config',
+        async handler(_req, res, next) {
+            try {
+                const { NODE_CONFIGS } = await Promise.resolve().then(() => __importStar(require('../scene/scene-process/service/node/node-type-config')));
+                // 表随 CLI 版本固定，但预览生命周期短，不缓存以免升级后拿到旧表。
+                res.set('Cache-Control', 'no-store');
+                res.status(200).json(NODE_CONFIGS);
+            }
+            catch (err) {
+                next(err);
+            }
+        },
+    },
+];
+exports.default = {
+    get: [
+        {
+            // 游戏预览入口页面（浏览器游戏预览，PREVIEW 模式）
+            url: '/',
+            async handler(req, res, next) {
+                try {
+                    const { default: scripting } = await Promise.resolve().then(() => __importStar(require('../../core/scripting')));
+                    const serverBaseUrl = `${req.protocol}://${req.get('host')}`;
+                    const scene = typeof req.query.scene === 'string' ? req.query.scene : '';
+                    const sceneQuery = scene ? `?scene=${encodeURIComponent(scene)}` : '';
+                    // projectPath 可能在极早期（工程刚 open、scripting 尚未 initialize）为空——
+                    // `/` 提前注册以避免初始化期兜底 404，此时用兜底标题渲染即可（页面本身只需能加载
+                    // socket.io + browser:reload 监听，就绪后自愈刷新）。
+                    const projectName = scripting.projectPath ? (0, path_1.basename)(scripting.projectPath) : 'Preview';
+                    const renderData = {
+                        title: `Cocos Creator - ${projectName}`,
+                        serverURL: serverBaseUrl,
+                        settingsJs: `/preview/settings.js${sceneQuery}`,
+                        sceneQuery,
+                        previewToolbarOptions: (0, preview_toolbar_options_1.getPreviewToolbarOptions)(),
+                        // Keep the preview page aligned with Creator: localize device-mode names on the
+                        // server, then inject the resolved values into the browser page. The toolbar
+                        // itself does not need a second client-side i18n runtime.
+                        previewToolbarI18n: {
+                            device: {
+                                designResolution: i18n_1.default.t('common.preview.device.design_resolution'),
+                                fullScreen: i18n_1.default.t('common.preview.device.full_screen'),
+                                webpageFullScreen: i18n_1.default.t('common.preview.device.webpage_full_screen'),
+                            },
+                        },
+                    };
+                    const templatePath = (0, path_1.join)(global_1.GlobalPaths.workspace, 'static', 'web', 'game.ejs');
+                    const html = await ejs_1.default.renderFile(templatePath, renderData);
+                    // 预览入口页不缓存，避免浏览器复用旧的 boot/settings 引用
+                    res.set('Cache-Control', 'no-store');
+                    res.status(200).send(html);
+                }
+                catch (err) {
+                    next(err);
+                }
+            },
+        },
+        // 游戏运行时共享资源路由
+        ...exports.gamePreviewResourceRoutes,
+        // 共享的引擎 / 脚本 / SystemJS / import-map 等动态资源路由（含 /static/web）
+        ...scripting_routes_1.scriptingRoutes,
+    ],
+    post: [],
+    staticFiles: [],
+    socket: {
+        connection: (socket) => {
+            // 对齐 Creator preview-app：工具栏通过同一个 socket 上报 changeOption，
+            // 服务端保存会话状态，下一次页面渲染时重新注入。
+            socket.on?.('changeOption', (name, value) => {
+                (0, preview_toolbar_options_1.setPreviewToolbarOption)(name, value);
+            });
+        },
+        disconnect: (_socket) => { },
+    },
+};

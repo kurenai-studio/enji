@@ -17,9 +17,14 @@ export {
   detectProject,
 } from "./project/detect.js";
 export type { DetectedProject, ProjectKind } from "./project/detect.js";
-export {
-  EnjiProjectControl,
-  resolveKurenaiBin,
-  resolveKurenaiPackageRoot,
-} from "./project/control.js";
+export { EnjiProjectControl } from "./project/control.js";
 export type { EnjiTemplateId } from "./project/control.js";
+export {
+  DEFAULT_HOST_READY_TIMEOUT_MS,
+  cocosCoreRoot,
+  coreDepsReady,
+  ensureCoreDeps,
+  enjiPackageRoot,
+  hostEntry,
+  resolveHostReadyTimeoutMs,
+} from "./cocos/core.js";
