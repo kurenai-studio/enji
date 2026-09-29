@@ -235,6 +235,26 @@ material.setProperty('skyMap', cube); // samplerCube skyMap;
 Face order: +X, -X, +Y, -Y, +Z, -Z, laid out as in the GL spec (sampling
 `texture(skyMap, dir)` with the same directions you baked matches, no flip).
 
+### Models from Blender (glTF)
+
+Export `.glb` into `assets/resources/models/`, run `enji import` on the files,
+then take the mesh out of the generated prefab and use your own material:
+
+```ts
+const prefab = await preloadModel('models/B_room_a');
+const mesh = prefab.data.getComponentsInChildren(MeshRenderer)[0].mesh!;
+renderer.mesh = mesh;
+renderer.setSharedMaterial(castleMaterial, 0);
+```
+
+The importer reads only `COLOR_0` as `a_color`; `COLOR_1` and later are
+dropped. Blender's glTF exporter defaults to
+`export_all_vertex_colors=True`, which can write a white `COLOR_0` and move
+your data to `COLOR_1`; export with `export_vertex_color='NAME'`,
+`export_vertex_color_name='<attribute>'`, `export_all_vertex_colors=False`
+and check the accessors before importing. `examples/infinity-castle/tools/export_blocks.py`
+is a working headless export script.
+
 ### Built-in PBR materials
 
 Prefer a `.mtl` under `assets/resources/materials/` that references the

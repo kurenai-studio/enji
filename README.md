@@ -54,6 +54,16 @@ ray-traced refraction and reflection, caustics, floating sphere).
 | ![Enji pool water](examples/pool-water-shots/enji.jpg) | ![three.js pool water](examples/pool-water-shots/threejs.jpg) |
 | ![Enji underwater](examples/pool-water-shots/underwater.jpg) | ![three.js underwater](examples/pool-water-shots/threejs-underwater.jpg) |
 
+`examples/infinity-castle` is an endless fall through a procedural Infinity
+Castle shaft: block meshes generated in Blender and imported as glTF, pooled
+chunks, a custom castle shader with six nearest lanterns as point lights,
+additive lantern halos and warm haze. It holds 60 FPS with node counts that
+level off.
+
+| Enji (`examples/infinity-castle`) | Blender (EEVEE) reference |
+|---|---|
+| ![Enji Infinity Castle](examples/infinity-castle-shots/ic_mid.jpg) | ![Blender Infinity Castle](examples/infinity-castle-shots/blender-reference.jpg) |
+
 ## Meta contract
 
 See [docs/meta-gold.md](docs/meta-gold.md). Host writes go through an fs hook
