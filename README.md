@@ -7,11 +7,15 @@ Product line (浅 → 深): Pink → **Akane (2.x, reserved)** → **Enji (3.8)*
 > Agents working on **3.8** projects install **enji**, not kurenai.  
 > Preview reuses the kurenai 4.0 host; **disk `.meta` is capped to Creator 3.8.8**.
 
-## One-liner
+## One-liner (for agents)
+
+Paste only this; everything else is in the linked doc:
 
 ```text
-自学并用 Enji（https://github.com/kurenai-studio/enji：clone 后 Node.js 22+ 下 `npm install && npm link`；依赖本地 kurenai 的 host，不要单独装完整 cocos-cli）开发 Cocos Creator 3.8 工程：`enji init` → `host start` → 按项目 AGENTS.md 只改 assets/game 与 assets/resources；用 asset info / logs / check 闭环；.meta 由 Enji 按 3.8 金样生成/退级，不要手写；构建请用本机 Creator 3.8.8 IDE（enji 无 publish）。
+Download and follow https://raw.githubusercontent.com/kurenai-studio/enji/main/docs/getting-started.md (Enji / Creator 3.8).
 ```
+
+If the repo is already cloned: `Read enji/docs/getting-started.md and follow it exactly.`
 
 ## Why a separate repo
 

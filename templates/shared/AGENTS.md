@@ -55,6 +55,78 @@ enji check
 `enji check` scans reserved `@ccclass` names and re-caps any `.meta` above
 3.8 gold. It does **not** run a full TypeScript publish build.
 
+When a 3D view looks wrong, check `enji logs --errors` **before** redesigning
+art. Several failure modes look like “bad visuals” but are hard runtime errors.
+
+## 3D scenes: cameras vs Canvas
+
+The template `main.scene` already has a Canvas + UI camera. That UI camera
+defaults to clearing **color**. If you add a world / player camera and leave
+the Canvas camera alone, the 3D frame is wiped every frame → **black screen**
+(or only HUD).
+
+When adding a 3D camera:
+
+1. Game camera: `clearFlags = SOLID_COLOR` (or SKYBOX), lower `priority`.
+2. Every other camera (Canvas / UI): `clearFlags = DEPTH_ONLY`, higher `priority`.
+3. Prefer `ensureCanvas()` from `assets/enji/helpers.ts` for new UI cameras —
+   it already sets `DEPTH_ONLY`. Still fix any **existing** scene Canvas camera.
+
+```ts
+for (const cam of scene.getComponentsInChildren(Camera)) {
+    if (cam.node.name === 'PlayerCamera') continue;
+    cam.clearFlags = Camera.ClearFlag.DEPTH_ONLY;
+}
+```
+
+## Runtime materials (Enji preview)
+
+Enji preview is a 4.0 host with a **thin** builtin effect set. Do **not** assume
+Creator IDE defaults are all registered.
+
+Verified available for runtime `Material.initialize({ effectName })` in preview:
+
+- `builtin-unlit` (primary for code-built meshes)
+- `legacy/terrain`, a few `util/*` / pipeline helpers
+
+**Not** registered in preview (common agent mistake):
+
+- `builtin-standard` / PBR lit materials
+
+Symptoms when the effect is missing or defines did not apply:
+
+| Log / crash | Meaning |
+|-------------|---------|
+| `illegal property name: mainTexture` (or roughness / metallic) | Effect resolved poorly, or `USE_TEXTURE` / `USE_ALBEDO_MAP` never applied — property not on the pass |
+| `Cannot read properties of undefined (reading 'localSetLayout')` on `setSharedMaterial` | Material passes broken; do not keep swapping materials — fix `effectName` / defines first |
+
+Preferred pattern for procedural / voxel / debug meshes:
+
+```ts
+const mat = new Material();
+mat.initialize({
+    effectName: 'builtin-unlit',
+    defines: { USE_TEXTURE: true, USE_VERTEX_COLOR: true },
+});
+mat.setProperty('mainTexture', atlas);
+mat.setProperty('mainColor', Color.WHITE);
+```
+
+Face lighting: bake shade into vertex `colors` (top ≈ 1.0, sides ≈ 0.7–0.9,
+bottom ≈ 0.5). Do not rely on `DirectionalLight` + `builtin-standard` in Enji
+preview.
+
+Before shipping a new effect name, confirm it exists:
+
+```ts
+!!EffectAsset.get('builtin-unlit') // true in preview
+!!EffectAsset.get('builtin-standard') // false in preview today
+```
+
+Imported model materials (from glTF / prefab under `resources/`) are a separate
+path — use `loadModel` / `replaceMaterials`; those assets carry their own
+effects and are not limited to the runtime `effectName` list above.
+
 ## Build (not Enji)
 
 Open this project in **Cocos Creator 3.8.8** and build there. Do not install
