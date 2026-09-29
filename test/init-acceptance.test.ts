@@ -46,6 +46,23 @@ describe("enji init + meta acceptance", () => {
     expect(entries).not.toContain("publish");
   });
 
+  it("inits a 3D project with the 3d modules and a builtin-standard material", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "enji-init-3d-"));
+    const project = await new EnjiProjectControl().initialize(dir, "base-3d");
+    expect(project.dimension).toBe("3d");
+
+    const engine = JSON.parse(await readFile(join(dir, "settings/v2/packages/engine.json"), "utf8"));
+    const config = engine.modules.configs.defaultConfig;
+    expect(config.includeModules).toEqual(expect.arrayContaining(["3d", "primitive", "2d"]));
+    expect(config.cache["3d"]._value).toBe(true);
+
+    const mtl = JSON.parse(await readFile(join(dir, "assets/resources/materials/standard.mtl"), "utf8"));
+    expect(mtl._effectAsset.__uuid__).toBe("c8f66d17-351a-48da-a12c-0212d28575c4");
+    const mainView = await readFile(join(dir, "assets/game/MainView.ts"), "utf8");
+    expect(mainView).toContain("DirectionalLight");
+    await expect(readFile(join(dir, "assets/enji/Boot.ts"), "utf8")).resolves.toContain("MainView");
+  });
+
   it("gives each initialized project its own asset uuids and keeps scene references intact", async () => {
     const control = new EnjiProjectControl();
     const a = await mkdtemp(join(tmpdir(), "enji-uuid-a-"));

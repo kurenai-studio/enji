@@ -32,6 +32,11 @@ Older notes, skills or memories may describe a previous layout. They are obsolet
 - **v0.3.0** `enji check` reported only `scanned` / `changed`. Since v0.3.1 it
   also warns about unknown importers and orphan `.meta` files (see Loop), and
   `asset info` waits briefly for the running host to import a new file.
+- **v0.3** project `AGENTS.md` said `builtin-standard` is not available in
+  preview. It is (loaded on demand); see [rendering.md](rendering.md). Projects
+  created before v0.4 also lack the rendering helpers in `assets/enji/helpers.ts`
+  (`loadBuiltinEffect`, `updateDynamicMesh`, `createDataTexture`,
+  `createTexturePass`); copy them from `templates/shared/assets/enji/helpers.ts`.
 
 ## Environment
 
@@ -73,7 +78,7 @@ If an asset needs one of these, tell the user to open the project in Creator 3.8
 ## Loop
 
 ```sh
-enji init <dir> [--template base-ai]
+enji init <dir> [--3d]      # --3d: 3d modules, lit scene, PBR material
 cd <dir>
 enji host start             # prints previewUrl; open it in a browser
 # after adding or changing asset files (images, prefabs, materials, audio, …)
@@ -93,7 +98,15 @@ port when that one is taken. Always use the `previewUrl` printed by
 
 `enji logs --errors` returns `clean: true` only when a preview page has booted
 and no current errors remain. `clean: false` with `previewPage: "none"` means no
-page has run yet — open or reload `previewUrl` and ask again.
+page has run yet — open or reload `previewUrl` and ask again. Runtime errors
+carry `source` (first stack frame, mapped to `assets/…ts:line`); a shader
+compile failure is one entry whose `shader` field names the `.effect` file and
+line. All open preview tabs log into the same buffer (`openPages`, `page`).
+
+3D, lighting, custom shaders, render textures and per-frame meshes:
+read [rendering.md](rendering.md) first. It lists what the bundled renderer
+supports (for example, render textures are 8-bit, so float simulations run on
+the CPU and upload a float texture) and the helpers that make it work.
 
 `enji check` **writes**: any `.meta` `ver` above gold is rewritten in place and
 listed in `metaNormalize.files`, so expect those files in `git diff`. It also
@@ -112,8 +125,8 @@ up to 3 s for that. Outside that window, or with no host, use `enji import`.
 - Do not hand-edit `assets/enji/Boot.ts`, `*.scene`, or any `*.meta`
 - Reserved `@ccclass` names: `game`, `Game`, `camera`, `Camera`, `cc`, `CC`
 
-Full authoring rules: project **`AGENTS.md`** (camera `clearFlags`, preview
-`builtin-unlit`, etc.).
+Full authoring rules: project **`AGENTS.md`** (camera `clearFlags`, materials,
+helpers). Rendering details: [rendering.md](rendering.md).
 
 ## Checklist
 

@@ -214,6 +214,7 @@ export class EnjiProjectControl {
       `- creator: ${project.creatorVersion} (${project.kind})`,
       `- dimension: ${project.dimension}`,
       `- preview: ${preview.phase} ${preview.url}`,
+      `- docs: ${join(packageRoot(), "docs")} (getting-started.md, rendering.md)`,
       ``,
       `Rules: follow AGENTS.md. Preview via enji host (bundled cocos runtime).`,
       `Build with Creator ${CREATOR_VERSION} IDE — enji has no publish.`,

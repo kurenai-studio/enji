@@ -75,6 +75,8 @@ gone (delete them). It does **not** run a full TypeScript publish build.
 
 When a 3D view looks wrong, check `enji logs --errors` **before** redesigning
 art. Several failure modes look like “bad visuals” but are hard runtime errors.
+Error entries carry `source` (the first stack frame mapped to `assets/…ts:line`)
+and stack lines in `detail` already point at your TypeScript files.
 
 Engine modules (Spine, DragonBones, TiledMap, physics backend, …) come from
 `settings/v2/packages/engine.json`, i.e. Creator 3.8.8 Project Settings →
@@ -88,7 +90,9 @@ means a preview page booted and no current errors remain. `clean: false` with
 `previewPage: "none"` means no browser page has run since `host start` (not
 opened yet, or the tab still shows a connection error from the restart): open or
 reload the `previewUrl` and ask again. The port is not fixed; always take the URL
-from `enji host start` / `enji host status`.
+from `enji host start` / `enji host status`. Every open preview tab logs into the
+same buffer; `openPages` counts them and browser entries carry `page`. Close
+extra tabs when the output looks duplicated.
 
 ## 3D scenes: cameras vs Canvas
 
@@ -111,53 +115,37 @@ for (const cam of scene.getComponentsInChildren(Camera)) {
 }
 ```
 
-## Runtime materials (Enji preview)
+## Materials, lighting and custom shaders
 
-Enji preview is a 4.0 host with a **thin** builtin effect set. Do **not** assume
-Creator IDE defaults are all registered.
+Full guide with verified capabilities and recipes: `docs/rendering.md` in the
+Enji package (`enji context` prints the docs folder). Short version:
 
-Verified available for runtime `Material.initialize({ effectName })` in preview:
-
-- `builtin-unlit` (primary for code-built meshes)
-- `legacy/terrain`, a few `util/*` / pipeline helpers
-
-**Not** registered in preview (common agent mistake):
-
-- `builtin-standard` / PBR lit materials
-
-Symptoms when the effect is missing or defines did not apply:
+- Start 3D work with `enji init <dir> --3d`: 3d modules, camera, shadowed
+  directional light, ambient light and `resources/materials/standard.mtl`
+  (`builtin-standard`, PBR) are set up.
+- Only `builtin-unlit` is registered at start. `builtin-standard`,
+  `builtin-toon` and `advanced/*` effects load on demand: reference them from a
+  `.mtl` under `resources/` (needed for Creator builds too) or call
+  `loadBuiltinEffect('builtin-standard')` from `assets/enji/helpers.ts`.
+  `EffectAsset.get(name)` is only non-null after something loaded the effect.
+- Custom `.effect` files under `assets/resources/effects/` work; load them with
+  `loadEffect('effects/<name>')`. A shader compiles when its material is first
+  used: GLSL errors then appear in `enji logs --errors` as one entry pointing at
+  the `.effect` line (they do not fail `enji import`).
+- Render textures are 8 bits per channel. Keep float simulation state on the
+  CPU and upload it with `createDataTexture(w, h, { float: true })`; use
+  `createTexturePass` for 8-bit passes (caustics, blurs).
+- Meshes rebuilt every frame: `utils.MeshUtils.createDynamicMesh` once, then
+  `updateDynamicMesh(renderer, geometry)`. A bare `mesh.updateSubMesh` keeps
+  drawing the old triangle count.
 
 | Log / crash | Meaning |
 |-------------|---------|
-| `illegal property name: mainTexture` (or roughness / metallic) | Effect resolved poorly, or `USE_TEXTURE` / `USE_ALBEDO_MAP` never applied — property not on the pass |
-| `Cannot read properties of undefined (reading 'localSetLayout')` on `setSharedMaterial` | Material passes broken; do not keep swapping materials — fix `effectName` / defines first |
+| `illegal property name: mainTexture` (or roughness / metallic) | The property is not on the pass: wrong effect, or its define (`USE_TEXTURE`, `USE_ALBEDO_MAP`) was not set |
+| `Cannot read properties of undefined (reading 'localSetLayout')` on `setSharedMaterial` | The material never initialized (effect missing or failed to compile); fix the effect before swapping materials |
 
-Preferred pattern for procedural / voxel / debug meshes:
-
-```ts
-const mat = new Material();
-mat.initialize({
-    effectName: 'builtin-unlit',
-    defines: { USE_TEXTURE: true, USE_VERTEX_COLOR: true },
-});
-mat.setProperty('mainTexture', atlas);
-mat.setProperty('mainColor', Color.WHITE);
-```
-
-Face lighting: bake shade into vertex `colors` (top ≈ 1.0, sides ≈ 0.7–0.9,
-bottom ≈ 0.5). Do not rely on `DirectionalLight` + `builtin-standard` in Enji
-preview.
-
-Before shipping a new effect name, confirm it exists:
-
-```ts
-!!EffectAsset.get('builtin-unlit') // true in preview
-!!EffectAsset.get('builtin-standard') // false in preview today
-```
-
-Imported model materials (from glTF / prefab under `resources/`) are a separate
-path — use `loadModel` / `replaceMaterials`; those assets carry their own
-effects and are not limited to the runtime `effectName` list above.
+Imported model materials (from glTF / prefab under `resources/`) carry their own
+effects; use `loadModel` / `replaceMaterials`.
 
 ## Build (not Enji)
 
