@@ -46,6 +46,9 @@ const CLOSE_TIMEOUT_MS = 5000;
 const project = resolve(requireEnv('PROJECT'));
 const assetsDir = join(project, 'assets');
 const hostFile = join(project, 'temp', 'enji-host.json');
+// The runtime's config file. In a 3.8 project it is only derived from settings/v2
+// (what Creator 3.8.8 edits) and is migrated only when missing.
+const derivedConfigFile = join(project, 'settings', 'cocos.config.json');
 const port = Number(process.env.PORT || 7460);
 // cocos-cli preview ignores project.json startScene and otherwise falls back to
 // the first scene in asset-db, which is an engine-internal one.
@@ -479,6 +482,7 @@ async function main() {
   log(`project ${project}`);
   log(`cocos-cli ${cliRoot}`);
   clearStaleProgrammingLocks();
+  rmSync(derivedConfigFile, { force: true });
   registerRoutes();
 
   const { default: Launcher } = load('core/launcher');
@@ -496,6 +500,7 @@ async function main() {
     rmSync(hostFile, { force: true });
     setTimeout(() => {
       log('close timed out, forcing exit');
+      rmSync(derivedConfigFile, { force: true });
       process.exit(0);
     }, CLOSE_TIMEOUT_MS).unref();
     try {
@@ -503,6 +508,7 @@ async function main() {
     } catch (error) {
       log(`close failed: ${error instanceof Error ? error.message : String(error)}`);
     }
+    rmSync(derivedConfigFile, { force: true });
     process.exit(0);
   };
   process.once('SIGTERM', () => void shutdown('SIGTERM'));

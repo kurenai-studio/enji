@@ -58,6 +58,14 @@ enji check
 When a 3D view looks wrong, check `enji logs --errors` **before** redesigning
 art. Several failure modes look like “bad visuals” but are hard runtime errors.
 
+Engine modules (Spine, DragonBones, TiledMap, physics backend, …) come from
+`settings/v2/packages/engine.json`, i.e. Creator 3.8.8 Project Settings →
+Feature Cropping. The host reads it at start: after changing modules, run
+`enji host stop && enji host start`. Spine runs only the selected version
+(`spine-3.8` or `spine-4.2`); skeletons exported for the other version fail
+to load. The first page load after `host start` may not forward browser logs;
+reload once before trusting an empty `enji logs`.
+
 ## 3D scenes: cameras vs Canvas
 
 The template `main.scene` already has a Canvas + UI camera. That UI camera
