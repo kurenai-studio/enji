@@ -153,7 +153,7 @@ export class EnjiProjectControl {
     if (!project) {
       return {
         ok: false,
-        metaNormalize: { scanned: 0, changed: 0, files: [] },
+        metaNormalize: { scanned: 0, changed: 0, files: [], unknownImporters: [], orphans: [] },
         ccclass: { ok: false, hits: [], reserved: [] },
         errors: ["not a Cocos Creator project"],
         warnings: [],
@@ -169,6 +169,14 @@ export class EnjiProjectControl {
       );
     }
     const metaNormalize = await normalizeProjectMetas(project.projectPath);
+    for (const { path, importers } of metaNormalize.unknownImporters) {
+      warnings.push(
+        `${path}.meta: importer ${importers.map((name) => `"${name}"`).join(", ")} is not a Creator 3.8 importer, so enji cannot cap its ver; correct the importer name in that .meta and keep its uuid (enji import keeps whatever importer the .meta names)`,
+      );
+    }
+    for (const path of metaNormalize.orphans) {
+      warnings.push(`${path}: orphan .meta (asset file is gone); delete it`);
+    }
     const ccclass = await scanReservedCcclass(project.projectPath);
     if (!ccclass.ok) {
       for (const hit of ccclass.reserved) {

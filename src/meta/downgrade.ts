@@ -1,4 +1,4 @@
-import { META_ALLOWED_KEYS, META_GOLD_VER } from "./gold.js";
+import { META_ALLOWED_KEYS, META_GOLD_VER, META_KNOWN_IMPORTERS } from "./gold.js";
 
 export type MetaObject = {
   ver?: unknown;
@@ -97,6 +97,25 @@ export function downgradeMetaContent(
     content: `${JSON.stringify(meta, null, 2)}\n`,
     caps,
   };
+}
+
+/** Importer names in the meta tree (root + subMetas) that a 3.8 project does not know. */
+export function unknownImporters(
+  meta: MetaObject,
+  known: ReadonlySet<string> = META_KNOWN_IMPORTERS,
+): string[] {
+  const found = new Set<string>();
+  const walk = (node: MetaObject) => {
+    if (typeof node.importer === "string" && !known.has(node.importer)) found.add(node.importer);
+    const sub = node.subMetas;
+    if (sub && typeof sub === "object" && !Array.isArray(sub)) {
+      for (const child of Object.values(sub as Record<string, unknown>)) {
+        if (child && typeof child === "object" && !Array.isArray(child)) walk(child as MetaObject);
+      }
+    }
+  };
+  walk(meta);
+  return [...found];
 }
 
 /** True when any importer `ver` in the meta tree exceeds gold. */

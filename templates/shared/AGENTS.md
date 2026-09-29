@@ -54,7 +54,8 @@ enji asset info assets/resources/images/hero.png
 ```
 
 It only reads the existing `.meta` (`uuid`, `importer`, `subAssets`) and fails
-with “not imported yet” if there is none — run `enji import` then.
+with “not imported yet” if there is none — run `enji import` then. While the
+host runs it waits up to 3 s for the host's own import of a just-created file.
 
 ## Feedback loop
 
@@ -67,7 +68,10 @@ enji check
 ```
 
 `enji check` scans reserved `@ccclass` names and re-caps any `.meta` above
-3.8 gold. It does **not** run a full TypeScript publish build.
+3.8 gold **in place** (the rewritten files are listed in `metaNormalize.files`).
+Its `warnings` also name `.meta` files with an importer Creator 3.8 does not
+know (correct the name, keep the uuid) and orphan `.meta` files whose asset is
+gone (delete them). It does **not** run a full TypeScript publish build.
 
 When a 3D view looks wrong, check `enji logs --errors` **before** redesigning
 art. Several failure modes look like “bad visuals” but are hard runtime errors.

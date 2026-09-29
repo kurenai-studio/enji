@@ -1,10 +1,15 @@
+import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   compareVer,
   downgradeMetaContent,
   metaExceedsGold,
+  unknownImporters,
 } from "../src/meta/downgrade.js";
 import { META_GOLD_VER } from "../src/meta/gold.js";
+import { normalizeProjectMetas } from "../src/meta/normalize.js";
 
 describe("compareVer", () => {
   it("orders dotted versions", () => {
@@ -91,5 +96,45 @@ describe("downgradeMetaContent", () => {
       subMetas: {},
     };
     expect(metaExceedsGold(meta)).toBe(false);
+  });
+});
+
+describe("unknownImporters", () => {
+  it("flags importers outside the 3.8 set, including in subMetas", () => {
+    const meta = {
+      ver: "1.0.0",
+      importer: "typescript-4",
+      subMetas: { a: { importer: "texture" }, b: { importer: "future-thing" } },
+    };
+    expect(unknownImporters(meta).sort()).toEqual(["future-thing", "typescript-4"]);
+  });
+
+  it("accepts runtime importers the gold sample does not cover", () => {
+    for (const importer of ["gltf", "spine-data", "dragonbones", "instantiation-mesh"]) {
+      expect(unknownImporters({ importer })).toEqual([]);
+    }
+  });
+});
+
+describe("normalizeProjectMetas", () => {
+  it("reports unknown importers and orphan metas without failing", async () => {
+    const root = await mkdtemp(join(tmpdir(), "enji-norm-"));
+    const game = join(root, "assets", "game");
+    await mkdir(game, { recursive: true });
+    await writeFile(join(game, "Bad.ts"), "");
+    await writeFile(
+      join(game, "Bad.ts.meta"),
+      JSON.stringify({ ver: "4.0.24", importer: "typescript-4", uuid: "u1", subMetas: {} }),
+    );
+    await writeFile(
+      join(game, "Gone.ts.meta"),
+      JSON.stringify({ ver: "4.0.24", importer: "typescript", uuid: "u2", subMetas: {} }),
+    );
+    const report = await normalizeProjectMetas(root);
+    expect(report.scanned).toBe(2);
+    expect(report.unknownImporters).toEqual([
+      { path: "assets/game/Bad.ts", importers: ["typescript-4"] },
+    ]);
+    expect(report.orphans).toEqual(["assets/game/Gone.ts.meta"]);
   });
 });

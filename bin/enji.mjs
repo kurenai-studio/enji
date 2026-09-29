@@ -22,6 +22,7 @@ const META_HOOK = new URL('../lib/meta/hook.js', import.meta.url);
 const VERSION = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version;
 const STOP_TIMEOUT_MS = 8_000;
 const POLL_MS = 500;
+const WATCHER_GRACE_MS = 3_000;
 
 const USAGE = `enji ${VERSION}
 
@@ -40,6 +41,10 @@ import      import new or changed files under assets/ and write their .meta
             (starts the host if needed); returns uuid / type / sub-assets.
 asset info  read uuid / importer / sub-assets from an existing .meta
             (read-only, no host); fails if the file was never imported.
+            While the host runs it waits up to 3s for the watcher to import a new file.
+check       rewrites any .meta ver above the 3.8.8 gold table in place (listed in
+            metaNormalize.files); reports unknown importers and orphan .meta as
+            warnings; scans reserved @ccclass names.
 
 Enji is Creator 3.8 only. Preview runs a bundled cocos runtime with 3.8 meta caps.
 There is no publish — build in Creator 3.8.8 IDE.
@@ -311,7 +316,11 @@ async function main() {
       imported: assets.length - failed,
       failed,
       assets,
-      metaNormalize: { scanned: meta.scanned, changed: meta.changed },
+      metaNormalize: {
+        scanned: meta.scanned,
+        changed: meta.changed,
+        ...(meta.unknownImporters.length ? { unknownImporters: meta.unknownImporters } : {}),
+      },
     });
     if (failed) process.exitCode = 1;
     return;
@@ -321,10 +330,22 @@ async function main() {
     const file = resolve(target);
     const project = resolveProject(options, file);
     const { readAssetInfo } = await import('../lib/index.js');
+    const metaPath = `${file}.meta`;
+    const hostRunning = Boolean(readHostFile(project));
+    if (hostRunning && existsSync(file) && !existsSync(metaPath)) {
+      const deadline = Date.now() + WATCHER_GRACE_MS;
+      while (!existsSync(metaPath) && Date.now() < deadline) await sleep(200);
+    }
     try {
       print({ ok: true, asset: await readAssetInfo(project, file) });
     } catch (error) {
-      exitWith(error instanceof Error ? error.message : String(error));
+      const message = error instanceof Error ? error.message : String(error);
+      const stillImporting = hostRunning && existsSync(file) && !existsSync(metaPath);
+      exitWith(
+        stillImporting
+          ? `${message} (the host watcher may still be importing it; retry shortly or run \`enji import\` to wait for it)`
+          : message,
+      );
     }
     return;
   }

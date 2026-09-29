@@ -1,7 +1,7 @@
-<!-- enji-doc-version: 0.3.0 -->
+<!-- enji-doc-version: 0.3.1 -->
 # Enji (Creator 3.8) — agent bootstrap
 
-Verified against **enji v0.3.0** (2026-09-29). After install, `enji --version`
+Verified against **enji v0.3.1** (2026-09-29). After install, `enji --version`
 must print the same version; if it does not, re-read this file from the
 repository you actually installed.
 
@@ -29,6 +29,9 @@ Older notes, skills or memories may describe a previous layout. They are obsolet
   addons to build; Node 22 and 24 both work.
 - **v0.2** `enji asset info` imported files and wrote `.meta`. Since v0.3 that is
   `enji import`; `asset info` only reads an existing `.meta`.
+- **v0.3.0** `enji check` reported only `scanned` / `changed`. Since v0.3.1 it
+  also warns about unknown importers and orphan `.meta` files (see Loop), and
+  `asset info` waits briefly for the running host to import a new file.
 
 ## Environment
 
@@ -91,6 +94,16 @@ port when that one is taken. Always use the `previewUrl` printed by
 `enji logs --errors` returns `clean: true` only when a preview page has booted
 and no current errors remain. `clean: false` with `previewPage: "none"` means no
 page has run yet — open or reload `previewUrl` and ask again.
+
+`enji check` **writes**: any `.meta` `ver` above gold is rewritten in place and
+listed in `metaNormalize.files`, so expect those files in `git diff`. It also
+lists, as `warnings`, `.meta` files naming an importer Creator 3.8 does not know
+(`metaNormalize.unknownImporters`; enji cannot cap those, and `enji import` keeps
+the importer the `.meta` names, so correct the name and keep the uuid) and orphan
+`.meta` files whose asset is gone (`metaNormalize.orphans`; delete them).
+
+While the host runs it imports new files by itself, and `enji asset info` waits
+up to 3 s for that. Outside that window, or with no host, use `enji import`.
 
 ## What to edit
 

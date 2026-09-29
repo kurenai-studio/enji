@@ -63,6 +63,26 @@ export const META_GOLD_VER: Readonly<Record<string, string>> = {
   "video-clip": "1.0.0",
 };
 
+/**
+ * Importers a 3.8 project may legitimately contain: the gold table plus the ones the
+ * bundled runtime registers that the gold sample happened not to cover (no ver cap).
+ * Anything else is a typo or a foreign (e.g. Creator 4.0) importer that escapes capping.
+ */
+export const META_KNOWN_IMPORTERS: ReadonlySet<string> = new Set([
+  ...Object.keys(META_GOLD_VER),
+  "alpha-image",
+  "dragonbones",
+  "dragonbones-atlas",
+  "gltf",
+  "instantiation-animation",
+  "instantiation-material",
+  "instantiation-mesh",
+  "instantiation-skeleton",
+  "sign-image",
+  "spine-data",
+  "texture-cube-face",
+]);
+
 /** Canonical empty userData shapes for newly generated template metas. */
 export const META_GOLD_SHAPES: Readonly<
   Record<

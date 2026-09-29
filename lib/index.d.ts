@@ -73,6 +73,13 @@ interface NormalizeReport {
       to: string;
     }>;
   }>;
+  /** Assets whose `.meta` names an importer outside the 3.8 set; never capped. */
+  unknownImporters: Array<{
+    path: string;
+    importers: string[];
+  }>;
+  /** `.meta` files whose asset no longer exists (project-relative meta paths). */
+  orphans: string[];
 }
 /** Cap every `.meta` under `assets/` to 3.8 gold (post-write / open-existing). */
 declare function normalizeProjectMetas(projectRoot: string): Promise<NormalizeReport>;

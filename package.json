@@ -1,6 +1,6 @@
 {
   "name": "@kurenai-studio/enji",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Enji — Creator 3.8 preview/edit workflow (no publish). Bundles a trimmed cocos runtime with 3.8 meta caps.",
   "type": "module",
   "main": "lib/index.js",
