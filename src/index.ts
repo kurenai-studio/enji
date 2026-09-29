@@ -7,6 +7,8 @@ export {
 } from "./meta/downgrade.js";
 export { installMetaHooks } from "./meta/install-hooks.js";
 export { normalizeProjectMetas } from "./meta/normalize.js";
+export { assetPathInProject, listImportTargets, readAssetInfo } from "./meta/asset-info.js";
+export type { MetaAssetInfo, MetaSubAsset } from "./meta/asset-info.js";
 export {
   RESERVED_CCCLASS_NAMES,
   scanReservedCcclass,

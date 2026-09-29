@@ -29,8 +29,8 @@
  *        last successful preview boot (reported as `superseded`) unless all=1.
  *        previewPage is none | connected | booted: whether any browser page has
  *        reported since host start, so an empty error list can be trusted.
- *   GET  /__enji/asset?path=<abs or relative to project>
- *        refreshes the file, then returns asset-db's uuid / type / sub-assets
+ *   GET  /__enji/asset?path=<abs or relative to project>[&refresh=0]
+ *        refreshes the file (unless refresh=0), then returns asset-db's uuid / type / sub-assets
  *
  * While ready, the host advertises itself in <project>/temp/enji-host.json
  * so the `enji` CLI can find it.
@@ -441,7 +441,7 @@ function registerRoutes() {
             res.status(404).json({ ok: false, error: `no such file: ${relative(project, target)}` });
             return;
           }
-          await refresh([target], 'api');
+          if (req.query.refresh !== '0') await refresh([target], 'api');
           const { assetManager } = load('core/assets');
           const info = assetManager.queryAssetInfo(target);
           if (!info) {

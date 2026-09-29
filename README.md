@@ -31,7 +31,8 @@ If the repo is already cloned: `Read enji/docs/getting-started.md and follow it 
 enji init <dir> [--template base-ai]
 enji open [--project <dir>]
 enji host start|status|stop [--project <dir>]
-enji asset info <file>
+enji import <file|dir>...      # import assets, write .meta, return uuids
+enji asset info <file>         # read-only lookup from an existing .meta
 enji logs [--errors [--all]]
 enji check
 enji context
@@ -78,7 +79,7 @@ records the source commit and what was dropped.
 
 - [x] Self-contained `enji` package (bundled, trimmed runtime; no kurenai checkout)
 - [x] Meta gold table from Creator 3.8.8 samples
-- [x] Meta downgrade on host write / check / asset info
+- [x] Meta downgrade on host write / check / import
 - [x] CLI: init / open / host / asset / logs / check — no publish
 - [x] 3.8 template + AGENTS (reserved `@ccclass`, IDE build)
 - [x] Existing 3.8 open: detect, ccclass scan, meta not upgraded past gold

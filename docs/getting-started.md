@@ -54,10 +54,11 @@ If an asset needs one of these, tell the user to open the project in Creator 3.8
 enji init <dir> [--template base-ai]
 cd <dir>
 enji host start
-# after editing assets/…
+# after adding or changing asset files (images, prefabs, materials, audio, …)
+enji import <file|dir>...   # writes .meta, returns uuids
 enji logs --errors
 enji check
-enji asset info <file>
+enji asset info <file>      # read-only uuid lookup of an imported file
 enji context
 ```
 

@@ -77,6 +77,30 @@ interface NormalizeReport {
 /** Cap every `.meta` under `assets/` to 3.8 gold (post-write / open-existing). */
 declare function normalizeProjectMetas(projectRoot: string): Promise<NormalizeReport>;
 //#endregion
+//#region src/meta/asset-info.d.ts
+interface MetaSubAsset {
+  uuid: string;
+  name?: string;
+  importer?: string;
+}
+interface MetaAssetInfo {
+  path: string;
+  url: string;
+  uuid: string;
+  importer: string;
+  imported: boolean;
+  subAssets: MetaSubAsset[];
+}
+/** Absolute path of `file` if it lies inside `<project>/assets`, else undefined. */
+declare function assetPathInProject(project: string, file: string): string | undefined;
+/**
+ * Reads uuid / importer / sub-assets from an existing `.meta` without starting the
+ * host. Throws when the file has not been imported yet.
+ */
+declare function readAssetInfo(project: string, file: string): Promise<MetaAssetInfo>;
+/** Files under `path` (or `path` itself), skipping `.meta` and dotfiles. */
+declare function listImportTargets(path: string): string[];
+//#endregion
 //#region src/project/ccclass-check.d.ts
 /** `@ccclass` names that collide with engine / reserved identifiers in Creator 3.x. */
 declare const RESERVED_CCCLASS_NAMES: Set<string>;
@@ -158,5 +182,5 @@ declare function resolveHostReadyTimeoutMs(options?: {
   readinessTimeoutMs?: number | undefined;
 }, env?: NodeJS.ProcessEnv): number;
 //#endregion
-export { CREATOR_VERSION, DEFAULT_HOST_READY_TIMEOUT_MS, type DetectedProject, EnjiProjectControl, type EnjiTemplateId, META_GOLD_SHAPES, META_GOLD_VER, type ProjectKind, RESERVED_CCCLASS_NAMES, assertEnjiProject, classifyCreatorVersion, cocosCoreRoot, compareVer, coreDepsReady, detectProject, downgradeMetaContent, downgradeMetaObject, enjiPackageRoot, ensureCoreDeps, hostEntry, installMetaHooks, metaExceedsGold, normalizeProjectMetas, resolveHostReadyTimeoutMs, scanReservedCcclass };
+export { CREATOR_VERSION, DEFAULT_HOST_READY_TIMEOUT_MS, type DetectedProject, EnjiProjectControl, type EnjiTemplateId, META_GOLD_SHAPES, META_GOLD_VER, type MetaAssetInfo, type MetaSubAsset, type ProjectKind, RESERVED_CCCLASS_NAMES, assertEnjiProject, assetPathInProject, classifyCreatorVersion, cocosCoreRoot, compareVer, coreDepsReady, detectProject, downgradeMetaContent, downgradeMetaObject, enjiPackageRoot, ensureCoreDeps, hostEntry, installMetaHooks, listImportTargets, metaExceedsGold, normalizeProjectMetas, readAssetInfo, resolveHostReadyTimeoutMs, scanReservedCcclass };
 //# sourceMappingURL=index.d.ts.map

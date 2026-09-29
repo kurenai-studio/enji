@@ -13,9 +13,8 @@ Creator 3.8.8 IDE (or a separate build MCP).
 - Prefabs go under `assets/resources/prefabs/`, materials under
   `assets/resources/materials/`, other files (images, audio) under `assets/resources/`.
 - Do not edit `assets/enji/Boot.ts` or `*.scene`.
-- Never write or edit `.meta` files by hand. Enji / the host creates them on
-  import and **keeps importer `ver` on Creator 3.8.8 gold**. Get uuids with
-  `enji asset info <file>`.
+- Never write or edit `.meta` files by hand. `enji import` creates them and
+  **keeps importer `ver` on Creator 3.8.8 gold**.
 - `assets/enji/helpers.ts` holds small helpers (`loadPrefab`, canvas, labels).
 
 ## `@ccclass` reserved names
@@ -34,20 +33,35 @@ Prefer unique names like `MainView`, `EnemyView`.
 - A prefab must not reference another prefab. Compose in code.
 - Prefer handwritten minimal prefabs; the importer may reformat them.
 
-## Getting uuids
+## Importing files and getting uuids
+
+After you create or change files under `assets/`, import them. This writes the
+`.meta` and returns the uuids you reference from prefabs, materials and code:
 
 ```sh
-enji asset info assets/resources/materials/red.mtl
+enji import assets/resources/materials/red.mtl        # one file
+enji import assets/resources/images                   # a whole folder
 ```
 
-Returns `{ ok, asset: { uuid, type, url, subAssets } }`. Enji normalizes `.meta`
-after import so stamps stay 3.8-compatible.
+Returns `{ ok, imported, failed, assets: [{ ok, path, uuid, type, importer, subAssets }] }`.
+Sub-assets carry their own uuid (e.g. an image's `spriteFrame` is `<uuid>@f9941`).
+A non-zero `failed` means the file content was rejected; fix the file and import again.
+
+To look up a file that is already imported, without importing:
+
+```sh
+enji asset info assets/resources/images/hero.png
+```
+
+It only reads the existing `.meta` (`uuid`, `importer`, `subAssets`) and fails
+with “not imported yet” if there is none — run `enji import` then.
 
 ## Feedback loop
 
 ```sh
 enji host start
 # edit assets/…
+enji import <new or changed asset files>   # scripts do not need this
 enji logs --errors
 enji check
 ```

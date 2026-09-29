@@ -5,6 +5,7 @@
  *   enji init <dir> [--template base-ai]
  *   enji open [--project <dir>]
  *   enji host start|status|stop [--project <dir>] [--timeout <seconds>]
+ *   enji import <file|dir>... [--project <dir>]
  *   enji asset info <file> [--project <dir>]
  *   enji logs [--since <seq>] [--errors [--all]] [--project <dir>]
  *   enji check [--project <dir>]
@@ -13,8 +14,8 @@
  * There is no `enji publish`. Build with Creator 3.8.8 IDE (or a separate MCP).
  */
 import { spawn } from 'node:child_process';
-import { closeSync, existsSync, mkdirSync, openSync, readFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { closeSync, existsSync, mkdirSync, openSync, readFileSync, statSync } from 'node:fs';
+import { dirname, join, relative, resolve } from 'node:path';
 import { parseArgs, resolveProjectDir, wantsHelp } from '../lib/cli/parse.js';
 
 const META_HOOK = new URL('../lib/meta/hook.js', import.meta.url);
@@ -25,10 +26,16 @@ const USAGE = `usage:
   enji init <dir> [--template base-ai]
   enji open [--project <dir>]
   enji host start|status|stop [--project <dir>] [--timeout <seconds>]
+  enji import <file|dir>... [--project <dir>]
   enji asset info <file> [--project <dir>]
   enji logs [--since <seq>] [--errors [--all]] [--project <dir>]
   enji check [--project <dir>]
   enji context [--project <dir>]
+
+import      import new or changed files under assets/ and write their .meta
+            (starts the host if needed); returns uuid / type / sub-assets.
+asset info  read uuid / importer / sub-assets from an existing .meta
+            (read-only, no host); fails if the file was never imported.
 
 Enji is Creator 3.8 only. Preview runs a bundled cocos runtime with 3.8 meta caps.
 There is no publish — build in Creator 3.8.8 IDE.
@@ -265,17 +272,52 @@ async function main() {
     }
   }
 
+  if (group === 'import' && command) {
+    const paths = positional.slice(1).map((path) => resolve(path));
+    const project = resolveProject(options, paths[0]);
+    const { assetPathInProject, listImportTargets, normalizeProjectMetas } = await import('../lib/index.js');
+    for (const path of paths) {
+      if (!assetPathInProject(project, path)) exitWith(`path must be inside ${join(project, 'assets')}: ${path}`);
+      if (!existsSync(path)) exitWith(`no such file or directory: ${path}`);
+    }
+    const host = await ensureHost(project, options);
+    const assets = [];
+    for (const path of paths) {
+      const isDir = statSync(path).isDirectory();
+      if (isDir) await fetch(`${host.serverUrl}/__enji/refresh?path=${encodeURIComponent(path)}`, { method: 'POST' });
+      for (const file of listImportTargets(path)) {
+        const query = `path=${encodeURIComponent(file)}${isDir ? '&refresh=0' : ''}`;
+        const body = await (await fetch(`${host.serverUrl}/__enji/asset?${query}`)).json();
+        assets.push(
+          body.ok
+            ? { ok: true, ...body.asset }
+            : { ok: false, path: relative(project, file), error: body.error, ...(body.asset ? { asset: body.asset } : {}) },
+        );
+      }
+    }
+    // Cap metas again after asset-db refresh.
+    const meta = await normalizeProjectMetas(project);
+    const failed = assets.filter((asset) => !asset.ok).length;
+    print({
+      ok: failed === 0,
+      imported: assets.length - failed,
+      failed,
+      assets,
+      metaNormalize: { scanned: meta.scanned, changed: meta.changed },
+    });
+    if (failed) process.exitCode = 1;
+    return;
+  }
+
   if (group === 'asset' && command === 'info' && target) {
     const file = resolve(target);
     const project = resolveProject(options, file);
-    const host = await ensureHost(project, options);
-    const response = await fetch(`${host.serverUrl}/__enji/asset?path=${encodeURIComponent(file)}`);
-    const body = await response.json();
-    // Cap metas again after asset-db refresh.
-    const { normalizeProjectMetas } = await import('../lib/index.js');
-    const meta = await normalizeProjectMetas(project);
-    print({ ...body, metaNormalize: { scanned: meta.scanned, changed: meta.changed } });
-    if (!body.ok) process.exitCode = 1;
+    const { readAssetInfo } = await import('../lib/index.js');
+    try {
+      print({ ok: true, asset: await readAssetInfo(project, file) });
+    } catch (error) {
+      exitWith(error instanceof Error ? error.message : String(error));
+    }
     return;
   }
 
