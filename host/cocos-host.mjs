@@ -26,7 +26,9 @@
  *   GET  /__enji/logs?since=<seq>&errors=1[&all=1]
  *        recent host output, including compile errors and forwarded browser logs;
  *        stack lines fold into their entry. errors=1 skips errors logged before the
- *        last successful preview boot (reported as `superseded`) unless all=1.
+ *        last successful preview boot (reported as `superseded`) unless all=1; an
+ *        asset-error is superseded only by a later successful /__enji/asset check of
+ *        the same path.
  *        previewPage is none | connected | booted: whether any browser page has
  *        reported since host start. With errors=1, clean is true only when a page
  *        booted and no current errors remain. Stack frames in preview chunks are
@@ -91,6 +93,9 @@ const LOG_CAPACITY = 500;
 const DETAIL_LINES = 12;
 const logBuffer = [];
 let logSeq = 0;
+/** Project-relative asset path -> logSeq of its last successful /__enji/asset check. */
+const assetOkSeq = new Map();
+const ASSET_ERROR_PATH = /asset-error path=(.*?) reason=/;
 // Seq of the last successful preview boot; errors logged before it were fixed by a later edit.
 let bootSeq = 0;
 // Seq of the last line forwarded from any browser page; 0 means no page has run since start.
@@ -643,8 +648,14 @@ function registerRoutes() {
             if (entry.seq <= since) return false;
             if (!errorsOnly) return true;
             if (entry.level !== 'error') return false;
-            // Asset import errors are not fixed by a script edit, so they never go stale.
-            if (entry.seq < bootSeq && !entry.line.includes('asset-error') && !includeSuperseded) {
+            if (includeSuperseded) return true;
+            // Asset import errors are not fixed by a script edit or a reload, only by
+            // a later successful import of the same path.
+            const assetPath = ASSET_ERROR_PATH.exec(entry.line)?.[1];
+            const stale = assetPath !== undefined
+              ? (assetOkSeq.get(assetPath) ?? 0) > entry.seq
+              : entry.seq < bootSeq;
+            if (stale) {
               superseded += 1;
               return false;
             }
@@ -709,6 +720,7 @@ function registerRoutes() {
             res.json({ ok: false, error: reason, asset });
             return;
           }
+          assetOkSeq.set(relative(project, target), logSeq);
           res.json({ ok: true, asset });
         },
       },

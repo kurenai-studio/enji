@@ -102,6 +102,7 @@ page has run yet — open or reload `previewUrl` and ask again. Runtime errors
 carry `source` (first stack frame, mapped to `assets/…ts:line`); a shader
 compile failure is one entry whose `shader` field names the `.effect` file and
 line. All open preview tabs log into the same buffer (`openPages`, `page`).
+An `asset-error` clears once `enji import` of the same path succeeds.
 
 3D, lighting, custom shaders, render textures and per-frame meshes:
 read [rendering.md](rendering.md) first. It lists what the bundled renderer

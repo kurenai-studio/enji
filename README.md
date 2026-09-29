@@ -49,6 +49,11 @@ dynamic meshes) and the template helpers for each. `examples/pool-water` is a
 full reference: a port of Evan Wallace's WebGL Water (height-field simulation,
 ray-traced refraction and reflection, caustics, floating sphere).
 
+| Enji (`examples/pool-water`) | three.js reference |
+|---|---|
+| ![Enji pool water](examples/pool-water-shots/enji.jpg) | ![three.js pool water](examples/pool-water-shots/threejs.jpg) |
+| ![Enji underwater](examples/pool-water-shots/underwater.jpg) | ![three.js underwater](examples/pool-water-shots/threejs-underwater.jpg) |
+
 ## Meta contract
 
 See [docs/meta-gold.md](docs/meta-gold.md). Host writes go through an fs hook

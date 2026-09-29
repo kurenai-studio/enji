@@ -19,10 +19,12 @@ export class MainView extends Component implements IView {
 
     bind(root: Node): void {
         const scene = director.getScene()!;
-        // The template Canvas camera draws the UI on top of the 3D camera.
+        // The template Canvas camera draws only the UI, on top of the 3D camera. Its
+        // default visibility also includes DEFAULT, which would draw the world twice.
         for (const cam of scene.getComponentsInChildren(Camera)) {
             cam.clearFlags = Camera.ClearFlag.DEPTH_ONLY;
             cam.priority = 1 << 30;
+            cam.visibility = Layers.Enum.UI_2D;
         }
         addLabel(root, 'Hello Enji 3D', { name: 'Title', fontSize: 32, y: 300 });
 

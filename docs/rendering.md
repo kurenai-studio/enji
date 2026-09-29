@@ -14,7 +14,9 @@ The `base-3d` template enables the `3d` and `primitive` engine modules and its
 `MainView` sets up what a 3D scene needs:
 
 - a perspective camera with `priority = 0` (the template Canvas camera is
-  switched to `DEPTH_ONLY` with a high priority so the UI draws on top)
+  switched to `DEPTH_ONLY`, a high priority and `visibility = UI_2D`, so it
+  draws only the UI, on top; its default visibility also includes `DEFAULT`
+  and would draw every 3D mesh a second time, flat, over the scene)
 - a directional light with a shadow map (`shadows.type = ShadowMap`)
 - ambient light (the template scene's HDR ambient is black; without it every
   face turned away from the light is pitch black)
@@ -41,7 +43,8 @@ and both names in `includeModules`), then `enji host stop && enji host start`.
 
 Because render targets are 8-bit, a simulation that needs float state (height
 fields, velocities, particles) runs on the CPU in typed arrays and is uploaded
-into a float data texture every frame. A 256×256 grid is cheap in JavaScript.
+into a float data texture every frame. A 256×256 grid is cheap in JavaScript: the `examples/pool-water` port of
+the three.js pool demo spends 3–9 ms per frame on it and runs at 52–60 FPS.
 Render passes are still useful for data that fits in 0–1 at 8 bits, such as
 caustics maps, blurs and baked lookups.
 
@@ -115,7 +118,7 @@ Rules that differ from plain WebGL / three.js:
   `blendState: { targets: [{ blend: true, blendSrc: src_alpha, blendDst: one_minus_src_alpha }] }`,
   `depthStencilState: { depthWrite: false }`, `rasterizerState: { cullMode: none }`.
   A pass with blending enabled is drawn in the transparent queue, after opaque
-  geometry.
+  geometry (the pipeline picks the queue from `blendState.targets[0].blend`).
 
 Create the material in code:
 
@@ -174,18 +177,26 @@ shaders on WebGL 2, so a grid mesh can be displaced on the GPU).
 ```ts
 const target = new RenderTexture();
 target.reset({ width: 1024, height: 1024 });
-const pass = createTexturePass(scene, causticsMaterial, target, -100);
-// optional: draw a custom mesh instead of the full-screen quad
-pass.quad.getComponent(MeshRenderer)!.mesh = waterGrid;
+const pass = createTexturePass(scene, causticsMaterial, target, {
+  priority: -100,   // default
+  mesh: waterGrid,  // optional: draw this instead of the full-screen quad
+});
 otherMaterial.setProperty('causticTex', target);
 ```
 
 The pass effect's vertex shader outputs clip-space positions itself
-(`return vec4(a_position.xy * 2.0, 0.0, 1.0);` for the quad). Passes render in
-ascending `priority`, before any camera with a higher priority; keep the scene
-camera above all passes. Each pass uses its own user layer (bits 0–19), so give
-the scene camera `visibility = Layers.Enum.DEFAULT` to keep pass geometry out of
-the main view.
+(`return vec4(a_position.xy * 2.0, 0.0, 1.0);` for the quad). Texel (u, v) of
+the target receives clip position (u * 2 - 1, v * 2 - 1), with no Y flip
+(verified on WebGL 2 by reading the target back), so a shader that samples the
+target at `clip.xy * 0.5 + 0.5` reads what the pass wrote there. A custom
+`mesh` is still frustum-culled by the pass camera, which frames local x, y in
+[-1, 1] (times the target aspect in x): keep the mesh bounds inside that
+square. Swap geometry or material later through `pass.renderer`.
+
+Passes render in ascending `priority`, before any camera with a higher
+priority; keep the scene camera above all passes. Each pass uses its own user
+layer (bits 0–19), so give the scene camera `visibility = Layers.Enum.DEFAULT`
+to keep pass geometry out of the main view.
 
 ### Geometry that changes every frame
 
@@ -211,7 +222,8 @@ for (let face = 0; face < 6; face++) cube.uploadData(facePixels(face), 0, face);
 material.setProperty('skyMap', cube); // samplerCube skyMap;
 ```
 
-Face order: +X, -X, +Y, -Y, +Z, -Z.
+Face order: +X, -X, +Y, -Y, +Z, -Z, laid out as in the GL spec (sampling
+`texture(skyMap, dir)` with the same directions you baked matches, no flip).
 
 ### Built-in PBR materials
 
