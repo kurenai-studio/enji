@@ -45,24 +45,16 @@ There is **no** `enji publish`.
 
 [docs/rendering.md](docs/rendering.md) lists what the bundled renderer supports
 (custom effects, PBR, shadows, float data textures, 8-bit render textures,
-dynamic meshes) and the template helpers for each. `examples/pool-water` is a
-full reference: a port of Evan Wallace's WebGL Water (height-field simulation,
-ray-traced refraction and reflection, caustics, floating sphere).
+dynamic meshes) and the template helpers for each.
 
-| Enji (`examples/pool-water`) | three.js reference |
-|---|---|
-| ![Enji pool water](examples/pool-water-shots/enji.jpg) | ![three.js pool water](examples/pool-water-shots/threejs.jpg) |
-| ![Enji underwater](examples/pool-water-shots/underwater.jpg) | ![three.js underwater](examples/pool-water-shots/threejs-underwater.jpg) |
+Complete example projects live in a separate repository,
+[kurenai-studio/enji-demos](https://github.com/kurenai-studio/enji-demos), so
+installing Enji does not download them:
 
-`examples/infinity-castle` is an endless fall through a procedural Infinity
-Castle shaft: block meshes generated in Blender and imported as glTF, pooled
-chunks, a custom castle shader with six nearest lanterns as point lights,
-additive lantern halos and warm haze. It holds 60 FPS with node counts that
-level off.
-
-| Enji (`examples/infinity-castle`) | Blender (EEVEE) reference |
-|---|---|
-| ![Enji Infinity Castle](examples/infinity-castle-shots/ic_mid.jpg) | ![Blender Infinity Castle](examples/infinity-castle-shots/blender-reference.jpg) |
+- `pool-water`: a port of Evan Wallace's WebGL Water (height-field simulation,
+  ray-traced refraction and reflection, caustics, floating sphere).
+- `infinity-castle`: an endless fall through a procedural Infinity Castle
+  shaft (Blender-generated glTF blocks, pooled chunks, custom lantern lighting).
 
 ## Meta contract
 

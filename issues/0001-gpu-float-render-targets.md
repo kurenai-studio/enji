@@ -63,6 +63,6 @@ Ship the result as a helper (for example `assets/enji/gpgpu.ts` +
 
 - A GPU height-field prototype runs in the Enji preview and in a Creator 3.8.8
   web build.
-- `examples/pool-water` can switch its simulation from CPU to GPU, with frame
+- the `pool-water` demo (enji-demos repository) can switch its simulation from CPU to GPU, with frame
   time measured for both at 256² and 1024².
 - `docs/rendering.md` documents the helper and its limits.

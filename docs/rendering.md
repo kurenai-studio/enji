@@ -43,8 +43,11 @@ and both names in `includeModules`), then `enji host stop && enji host start`.
 
 Because render targets are 8-bit, a simulation that needs float state (height
 fields, velocities, particles) runs on the CPU in typed arrays and is uploaded
-into a float data texture every frame. A 256×256 grid is cheap in JavaScript: the `examples/pool-water` port of
-the three.js pool demo spends 4.8 ms per frame on it on average (p95 6.9 ms) and runs at 59 FPS.
+into a float data texture every frame. A 256×256 grid is cheap in JavaScript:
+the `pool-water` demo in
+[enji-demos](https://github.com/kurenai-studio/enji-demos), a port of the
+three.js pool, spends 4.8 ms per frame on it on average (p95 6.9 ms) and runs
+at 59 FPS.
 Render passes are still useful for data that fits in 0–1 at 8 bits, such as
 caustics maps, blurs and baked lookups.
 
@@ -252,8 +255,9 @@ dropped. Blender's glTF exporter defaults to
 `export_all_vertex_colors=True`, which can write a white `COLOR_0` and move
 your data to `COLOR_1`; export with `export_vertex_color='NAME'`,
 `export_vertex_color_name='<attribute>'`, `export_all_vertex_colors=False`
-and check the accessors before importing. `examples/infinity-castle/tools/export_blocks.py`
-is a working headless export script.
+and check the accessors before importing. `infinity-castle/tools/export_blocks.py`
+in [enji-demos](https://github.com/kurenai-studio/enji-demos) is a working
+headless export script.
 
 ### Built-in PBR materials
 

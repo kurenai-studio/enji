@@ -3,7 +3,3 @@ node_modules/
 .DS_Store
 temp/
 coverage/
-examples/*/library/
-examples/*/local/
-examples/*/build/
-examples/*/profiles/

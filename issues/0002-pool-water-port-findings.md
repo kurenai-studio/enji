@@ -1,7 +1,7 @@
 # Enji rough edges found while porting the three.js pool demo
 
 Status: open. Recorded 2026-09-29 on branch `feat/3d-water` from the
-`examples/pool-water` port. Already fixed in that branch: stale `asset-error`
+`pool-water` port (now in the enji-demos repository). Already fixed in that branch: stale `asset-error`
 entries (now superseded by a successful import of the same path) and the
 template Canvas camera drawing the 3D world a second time.
 
