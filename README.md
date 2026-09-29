@@ -2,7 +2,7 @@
 
 Creator **3.8** preview / edit for agents. **No publish.**
 
-Product line (浅 → 深): Pink → [Akane (2.x → 3.8)](https://github.com/kurenai-studio/akane) → **Enji (3.8)** → Kurenai (4.0).
+Product line (浅 → 深): Pink → Akane (reserved) → **Enji (3.8)** → Kurenai (4.0).
 
 > Agents working on **3.8** projects install **enji**, not kurenai.  
 > Self-contained: the preview runtime is bundled; **disk `.meta` is capped to Creator 3.8.8**.
