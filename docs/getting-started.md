@@ -1,4 +1,9 @@
+<!-- enji-doc-version: 0.3.0 -->
 # Enji (Creator 3.8) — agent bootstrap
+
+Verified against **enji v0.3.0** (2026-09-29). After install, `enji --version`
+must print the same version; if it does not, re-read this file from the
+repository you actually installed.
 
 Treat this file as the **only entry point**. Follow it in order. After
 `enji init`, coding rules live in the project root `AGENTS.md` (this file covers
@@ -12,6 +17,18 @@ Use **Enji** to develop / preview **Cocos Creator 3.8** projects.
 - Do **not** install full cocos-cli / PinK.
 - Enji has **no** `publish`. Ship builds with the local **Creator 3.8.8 IDE**
   (or another build MCP).
+
+## If you followed older instructions
+
+Older notes, skills or memories may describe a previous layout. They are obsolete:
+
+- **v0.1** needed a sibling `kurenai` checkout (`file:../kurenai`) and `npm run build`.
+  Since v0.2 Enji is self-contained: delete any kurenai clone you made for Enji
+  and install only as below.
+- **v0.1** required Node 24 (native `gl` module). Since v0.2 there are no native
+  addons to build; Node 22 and 24 both work.
+- **v0.2** `enji asset info` imported files and wrote `.meta`. Since v0.3 that is
+  `enji import`; `asset info` only reads an existing `.meta`.
 
 ## Environment
 
@@ -28,13 +45,15 @@ cd enji && npm install --omit=dev && npm link
 
 `lib/` is committed, so no build step is needed. `npm install` also installs the
 runtime's npm dependencies into `vendor/cocos-core/node_modules` (postinstall,
-about 80 MB download). If scripts were skipped (`--ignore-scripts`), run
-`node scripts/install-cocos-deps.mjs`; `enji host start` also does this on
-first run.
+about 80 MB download). npm may warn that the postinstall script is not covered
+by `allowScripts`; that is harmless. If the script was skipped, `enji host start`
+and `enji import` install the runtime dependencies on first use (or run
+`node scripts/install-cocos-deps.mjs`). `init`, `check` and `asset info` do not
+need them.
 
-Check: `enji --help`. Without link: `node <enji>/bin/enji.mjs --help`.
+Check: `enji --version` and `enji --help`. Without link: `node <enji>/bin/enji.mjs --help`.
 
-**On-disk `.meta` is forced down to Creator 3.8.8 gold.** Never hand-write `.meta`.
+**On-disk `.meta` is capped to the Creator 3.8.8 gold table.** Never hand-write `.meta`.
 
 ## Not covered by the bundled runtime
 
@@ -53,17 +72,25 @@ If an asset needs one of these, tell the user to open the project in Creator 3.8
 ```sh
 enji init <dir> [--template base-ai]
 cd <dir>
-enji host start
+enji host start             # prints previewUrl; open it in a browser
 # after adding or changing asset files (images, prefabs, materials, audio, …)
 enji import <file|dir>...   # writes .meta, returns uuids
-enji logs --errors
+enji logs --errors          # trust it only when "clean": true
 enji check
 enji asset info <file>      # read-only uuid lookup of an imported file
 enji context
 ```
 
-Also: `enji open`, `enji host status|stop`.  
+Also: `enji open`, `enji host status|stop`.
 There is **no** `enji publish`. For release builds, open Creator **3.8.8**.
+
+The preview port is **not fixed**: it starts at 7460 and moves to the next free
+port when that one is taken. Always use the `previewUrl` printed by
+`enji host start` / `enji host status`; never hard-code a port.
+
+`enji logs --errors` returns `clean: true` only when a preview page has booted
+and no current errors remain. `clean: false` with `previewPage: "none"` means no
+page has run yet — open or reload `previewUrl` and ask again.
 
 ## What to edit
 
@@ -77,7 +104,12 @@ Full authoring rules: project **`AGENTS.md`** (camera `clearFlags`, preview
 
 ## Checklist
 
+- [ ] `enji --version` prints the version this file was verified against
 - [ ] `enji --help` works from a single enji clone (no kurenai checkout)
-- [ ] `enji host start` returns a preview URL; `enji logs --errors` stays clean
-- [ ] New assets keep 3.8-shaped `.meta` (no 4.0.x importer `ver`)
+- [ ] `enji host start` returns a preview URL; after opening it, `enji logs --errors` reports `"clean": true`
+- [ ] No `.meta` has an importer `ver` above the Creator 3.8.8 gold table
+  ([meta-gold.json](meta-gold.json)). `typescript` / `javascript` at `4.0.24` **is**
+  the 3.8.8 gold value, not a 4.0 stamp — see
+  [meta-gold.md, Notable facts](meta-gold.md#notable-facts). Do not edit `.meta`
+  to "fix" it; `enji check` caps anything above gold.
 - [ ] Shipping goes through Creator 3.8.8 IDE, not a publish subcommand

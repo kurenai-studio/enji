@@ -19,10 +19,14 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { parseArgs, resolveProjectDir, wantsHelp } from '../lib/cli/parse.js';
 
 const META_HOOK = new URL('../lib/meta/hook.js', import.meta.url);
+const VERSION = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version;
 const STOP_TIMEOUT_MS = 8_000;
 const POLL_MS = 500;
 
-const USAGE = `usage:
+const USAGE = `enji ${VERSION}
+
+usage:
+  enji --version
   enji init <dir> [--template base-ai]
   enji open [--project <dir>]
   enji host start|status|stop [--project <dir>] [--timeout <seconds>]
@@ -170,6 +174,10 @@ function printUsage(exitCode) {
 
 async function main() {
   const argv = process.argv.slice(2);
+  if (argv[0] === '--version' || argv[0] === '-v' || argv[0] === 'version') {
+    process.stdout.write(`${VERSION}\n`);
+    return;
+  }
   if (wantsHelp(argv)) printUsage(0);
 
   const { positional, options } = parseArgs(argv);

@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import { CREATOR_VERSION } from "../meta/gold.js";
 import { normalizeProjectMetas } from "../meta/normalize.js";
 import { scanReservedCcclass } from "./ccclass-check.js";
+import { regenerateAssetUuids } from "./uuid.js";
 import {
   assertEnjiProject,
   detectProject,
@@ -116,6 +117,7 @@ export class EnjiProjectControl {
     await copyDirectoryContents(templateDir(template), target);
     await copyDirectoryContents(sharedDir(), target);
     await assignProjectIdentity(target);
+    await regenerateAssetUuids(target);
     const project = await this.inspect(target);
     if (!project) {
       throw new Error("The initialized template is not a Cocos Creator project");
@@ -198,7 +200,7 @@ export class EnjiProjectControl {
       `- dimension: ${project.dimension}`,
       `- preview: ${preview.phase} ${preview.url}`,
       ``,
-      `Rules: follow AGENTS.md. Preview via enji host (4.0 runtime).`,
+      `Rules: follow AGENTS.md. Preview via enji host (bundled cocos runtime).`,
       `Build with Creator ${CREATOR_VERSION} IDE — enji has no publish.`,
       `.meta files must stay on Creator 3.8 importer stamps (enji caps them).`,
     ].join("\n");

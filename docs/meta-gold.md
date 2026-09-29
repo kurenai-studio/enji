@@ -21,5 +21,5 @@ is Enji’s contract for disk `.meta` stamps.
 
 ## Gold `ver` table
 
-See `src/meta/gold.ts` (`META_GOLD_VER`) for the machine-readable table shipped
-with the package.
+See [meta-gold.json](meta-gold.json) and `src/meta/gold.ts` (`META_GOLD_VER`)
+for the machine-readable table shipped with the package.

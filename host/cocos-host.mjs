@@ -28,7 +28,8 @@
  *        stack lines fold into their entry. errors=1 skips errors logged before the
  *        last successful preview boot (reported as `superseded`) unless all=1.
  *        previewPage is none | connected | booted: whether any browser page has
- *        reported since host start, so an empty error list can be trusted.
+ *        reported since host start. With errors=1, clean is true only when a page
+ *        booted and no current errors remain.
  *   GET  /__enji/asset?path=<abs or relative to project>[&refresh=0]
  *        refreshes the file (unless refresh=0), then returns asset-db's uuid / type / sub-assets
  *
@@ -419,6 +420,8 @@ function registerRoutes() {
             ok: true,
             lastSeq: logSeq,
             previewPage,
+            // true only when a page booted and no current error remains; false also means "cannot tell yet".
+            ...(errorsOnly ? { clean: previewPage === 'booted' && entries.length === 0 } : {}),
             ...(previewPage === 'none'
               ? { hint: `No preview page has run since host start; open or reload ${state.url} before trusting an empty result.` }
               : {}),

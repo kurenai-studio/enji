@@ -79,10 +79,12 @@ Feature Cropping. The host reads it at start: after changing modules, run
 (`spine-3.8` or `spine-4.2`); skeletons exported for the other version fail
 to load.
 
-An empty `enji logs --errors` only means “no errors” when `previewPage` is
-`booted`. `none` means no browser page has run since `host start` (not opened
-yet, or the tab is still showing a connection error from the restart): open or
-reload the preview URL and ask again.
+Read `clean` from `enji logs --errors`, not the length of `entries`. `clean: true`
+means a preview page booted and no current errors remain. `clean: false` with
+`previewPage: "none"` means no browser page has run since `host start` (not
+opened yet, or the tab still shows a connection error from the restart): open or
+reload the `previewUrl` and ask again. The port is not fixed; always take the URL
+from `enji host start` / `enji host status`.
 
 ## 3D scenes: cameras vs Canvas
 

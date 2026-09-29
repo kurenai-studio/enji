@@ -28,6 +28,7 @@ If the repo is already cloned: `Read enji/docs/getting-started.md and follow it 
 ## CLI
 
 ```text
+enji --version
 enji init <dir> [--template base-ai]
 enji open [--project <dir>]
 enji host start|status|stop [--project <dir>]

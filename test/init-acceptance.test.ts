@@ -5,6 +5,21 @@ import { describe, expect, it } from "vitest";
 import { EnjiProjectControl } from "../src/project/control.js";
 import { downgradeMetaContent } from "../src/meta/downgrade.js";
 import { META_GOLD_VER } from "../src/meta/gold.js";
+import { compressUuid } from "../src/project/uuid.js";
+
+const TEMPLATE_UUIDS: Record<string, string> = {
+  "assets/main.scene.meta": "51b3f924-32af-4774-85ba-208f6025ef77",
+  "assets/game/MainView.ts.meta": "b7e2c1a0-9d8f-4e3b-a1c2-0f9e8d7c6b5a",
+  "assets/enji/Boot.ts.meta": "14158daa-c83c-44fb-9175-055ec7368a57",
+  "assets/enji/IView.ts.meta": "4d1b983b-5282-4bbc-b1d7-dc75914d2902",
+  "assets/enji/helpers.ts.meta": "cf6bd0fc-0d7a-4e60-845d-c391bf7b823f",
+};
+
+describe("compressUuid", () => {
+  it("matches Creator's script class id in the template scene", () => {
+    expect(compressUuid(TEMPLATE_UUIDS["assets/enji/Boot.ts.meta"]!)).toBe("141582qyDxE+5F1BV7HNopX");
+  });
+});
 
 describe("enji init + meta acceptance", () => {
   it("inits a 3.8.8 project without publish surface", async () => {
@@ -29,6 +44,38 @@ describe("enji init + meta acceptance", () => {
 
     const entries = await readdir(dir);
     expect(entries).not.toContain("publish");
+  });
+
+  it("gives each initialized project its own asset uuids and keeps scene references intact", async () => {
+    const control = new EnjiProjectControl();
+    const a = await mkdtemp(join(tmpdir(), "enji-uuid-a-"));
+    const b = await mkdtemp(join(tmpdir(), "enji-uuid-b-"));
+    await control.initialize(a, "base-ai");
+    await control.initialize(b, "base-ai");
+
+    const metas = [
+      "assets/main.scene.meta",
+      "assets/game/MainView.ts.meta",
+      "assets/enji/Boot.ts.meta",
+      "assets/enji/IView.ts.meta",
+      "assets/enji/helpers.ts.meta",
+    ];
+    for (const meta of metas) {
+      const uuidA = JSON.parse(await readFile(join(a, meta), "utf8")).uuid;
+      const uuidB = JSON.parse(await readFile(join(b, meta), "utf8")).uuid;
+      expect(uuidA, meta).not.toBe(uuidB);
+      expect(uuidA).not.toBe(TEMPLATE_UUIDS[meta]);
+    }
+
+    const scene = await readFile(join(a, "assets/main.scene"), "utf8");
+    const sceneUuid = JSON.parse(await readFile(join(a, "assets/main.scene.meta"), "utf8")).uuid;
+    const bootUuid = JSON.parse(await readFile(join(a, "assets/enji/Boot.ts.meta"), "utf8")).uuid;
+    expect(scene).toContain(sceneUuid);
+    expect(scene).toContain(`"__type__": "${compressUuid(bootUuid)}"`);
+    for (const old of Object.values(TEMPLATE_UUIDS)) {
+      expect(scene).not.toContain(old);
+      expect(scene).not.toContain(compressUuid(old));
+    }
   });
 
   it("open existing 3.8 caps over-stamped meta and keeps lower ver", async () => {
