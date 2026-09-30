@@ -55,6 +55,15 @@ installing Enji does not download them:
   ray-traced refraction and reflection, caustics, floating sphere).
 - `infinity-castle`: an endless fall through a procedural Infinity Castle
   shaft (Blender-generated glTF blocks, pooled chunks, custom lantern lighting).
+- `slots`: Lucky Reels, a 3-reel slots game one-shot by Cursor CLI against an
+  Enji host running in Docker (`docker/`).
+
+## Docker
+
+[docker/README.md](docker/README.md) builds an `enji:local` image and runs the
+preview host with `WATCH_POLL=1` (needed for bind mounts). Cursor Agent stays
+on the host unless you provide `CURSOR_API_KEY` (macOS keychain tokens do not
+transfer into Linux containers).
 
 ## Meta contract
 
