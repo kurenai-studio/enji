@@ -182,6 +182,28 @@ T4 规则写的是 `lineHeight round(fs * 1.25)`。fs = 18 时是 `round(22.5)`�
 - 换模型重复同一套实验。
 - 把第 6 条第 3 点的运行时检查做进 Enji 或模板，再测一次 T5-B 看子代理能否自己发现并修正灯光字段。
 
+## 7a. 后续验证：用这个结论做一个完整游戏
+
+同日把结论用于 `enji-demos/phantom-pocket-3d`（P5 风格类宝可梦，3D 战斗场景）：一个子代理从零开始，要求 UI 严格走 auto-ui-pipeline，HUD、道具袋、结算框和 3D 战斗舞台全部由它直接写成完整预制体，代码里不许 `new Node` / `addComponent`。任务说明附了本报告。
+
+| 预制体 | 节点 | 主要组件 | 生成方式 |
+|---|---|---|---|
+| `BattleStage` | 104 | Camera、DirectionalLight、SphereLight、SpotLight、80 个 MeshRenderer（内置几何体） | `tools/gen_stage.py` |
+| `BattleHud` | 91 | 38 Sprite、35 Label、9 Button、Widget、UIOpacity | `tools/gen_ui.py`（读 pipeline 导出的 `uilayout.json`） |
+| `BagDialog` | 38 | Sprite、Label、Button、BlockInputEvents | `tools/gen_ui.py` |
+| `ResultDialog` | 23 | 同上 | `tools/gen_ui.py` |
+
+- 四个预制体的运行时导出和预制体文件、设计意图逐项一致（子代理自写 `verify_dumps.py`，并用人为植入的 4 处错误验证了它能查出问题）。三盏灯都写了新旧两个强度字段。
+- 游戏代码里没有 `new Node` / `addComponent`；运行时节点只有四个预制体的实例和 glTF 模型实例（Enji 不允许预制体引用预制体，模型只能在代码里挂到锚点下）。
+- 无头浏览器自动通关脚本在 3 个随机种子下通过，`enji check` 和 `enji logs --errors` 干净。
+
+过程中暴露的 Enji 缺口（都不是预制体编写本身的问题）：
+
+- **没有正规途径设置九宫格边距。** 边距存在图片 `.meta` 里，而规则禁止手改 meta，`enji import` 也不提供参数。子代理只能在运行时改 `SpriteFrame.inset*`，单独打开预制体时看不到边距。本实验的夹具同样是手改 meta 设置的。
+- **2× 烘焙图的九宫格边框会画成两倍粗。** 子代理把 UI 预制体按 2 倍尺寸生成、根节点缩放 0.5 来绕过。
+- 打开 3D 模块后 `enji check` 仍报告 `"dimension": "2d"`。
+- TypeScript 7 下模板 `tsconfig.json` 报错：`TS5108: Option 'moduleResolution=node10' has been removed`。
+
 ## 8. 复现
 
 ```sh
