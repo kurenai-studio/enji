@@ -197,12 +197,17 @@ T4 规则写的是 `lineHeight round(fs * 1.25)`。fs = 18 时是 `round(22.5)`�
 - 游戏代码里没有 `new Node` / `addComponent`；运行时节点只有四个预制体的实例和 glTF 模型实例（Enji 不允许预制体引用预制体，模型只能在代码里挂到锚点下）。
 - 无头浏览器自动通关脚本在 3 个随机种子下通过，`enji check` 和 `enji logs --errors` 干净。
 
-过程中暴露的 Enji 缺口（都不是预制体编写本身的问题）：
+过程中暴露的 Enji 缺口（都不是预制体编写本身的问题），以及后续处理：
 
 - **没有正规途径设置九宫格边距。** 边距存在图片 `.meta` 里，而规则禁止手改 meta，`enji import` 也不提供参数。子代理只能在运行时改 `SpriteFrame.inset*`，单独打开预制体时看不到边距。本实验的夹具同样是手改 meta 设置的。
+  - **已修复（不加新命令）。** 工具链本来就支持：改 `subMetas.f9941.userData.borderLeft/Top/Right/Bottom` 后 `enji import` 该图片，资源会重新导入，`enji check` 的 meta 归一化也会保留这些值。用 `?prefab=` 单独加载预制体实测边距 32 → 0 → 32，跟着 meta 变。缺的只是规则：`templates/shared/AGENTS.md` 现在只禁止创建 meta、改 `uuid` / `ver` / `importer` / `subMetas` 的键，`userData` 里的导入设置允许编辑（等同 Creator 检查器），并新增「Importer settings」一节写明九宫格字段。
+  - 游戏已改：`tools/gen_ui.py` 把边距写进 38 张图片的 meta 再 `enji import`，删掉了 `UiView` 的运行时 `setInsets`。3 个种子重跑通关，截图不变。
 - **2× 烘焙图的九宫格边框会画成两倍粗。** 子代理把 UI 预制体按 2 倍尺寸生成、根节点缩放 0.5 来绕过。
+  - **不是 bug，是 Cocos 的语义**：边距以纹理像素计，切片按一个纹理像素对一个节点单位绘制。已写进 AGENTS.md 的「Importer settings」：2× 图要么 UI 缩放 0.5，要么按 1× 导出。游戏保留缩放 0.5 的做法。
 - 打开 3D 模块后 `enji check` 仍报告 `"dimension": "2d"`。
+  - **源码里已修**：`feat/3d-water` 分支（0.3.1）按引擎模块判断维度，并有 `enji init --3d`。子代理用的是全局安装的 `enji`，它链接到旧的 `~/WorkBuddy/enji`（0.3.0）。
 - TypeScript 7 下模板 `tsconfig.json` 报错：`TS5108: Option 'moduleResolution=node10' has been removed`。
+  - **已修复**：TS 5.9 下同样不能直接 `tsc`（`types` 里的声明路径相对 `temp/` 解析失败）。`templates/base-ai/tsconfig.json` 改为 `moduleResolution: bundler`、清空 `types`，并在 `files` 里直接列出 `temp/declarations/*.d.ts`。TS 7.0.2 和 5.9.3 下对本游戏和 2D 模板项目 `tsc --noEmit` 都干净。
 
 ## 8. 复现
 
