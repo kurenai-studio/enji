@@ -1,0 +1,310 @@
+{
+ "T1-B-r1": {
+  "run": "T1-B-r1",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 28,
+  "total": 28,
+  "fails": [],
+  "nfails": 0
+ },
+ "T1-A-r1": {
+  "run": "T1-A-r1",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 28,
+  "total": 28,
+  "fails": [],
+  "nfails": 0
+ },
+ "T2-A-r1": {
+  "run": "T2-A-r1",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 91,
+  "total": 91,
+  "fails": [],
+  "nfails": 0
+ },
+ "T2-B-r1": {
+  "run": "T2-B-r1",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 91,
+  "total": 91,
+  "fails": [],
+  "nfails": 0
+ },
+ "T3-A-r1": {
+  "run": "T3-A-r1",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 659,
+  "total": 659,
+  "fails": [],
+  "nfails": 0
+ },
+ "T3-B-r1": {
+  "run": "T3-B-r1",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 659,
+  "total": 659,
+  "fails": [],
+  "nfails": 0
+ },
+ "T4-A-r1": {
+  "run": "T4-A-r1",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 951,
+  "total": 951,
+  "fails": [],
+  "nfails": 0
+ },
+ "T4-B-r1": {
+  "run": "T4-B-r1",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 951,
+  "total": 951,
+  "fails": [],
+  "nfails": 0
+ },
+ "T5-B-r1": {
+  "run": "T5-B-r1",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 0.9508,
+  "passed": 58,
+  "total": 61,
+  "fails": [
+   "Sun: cc.DirectionalLight.illuminanceHDR 65000 != 80000",
+   "Lamps/FillLight: cc.SphereLight.luminanceHDR 1913.8445799108247 != 2000",
+   "Lamps/RimSpot: cc.SpotLight.luminanceHDR 1913.8445799108247 != 3000"
+  ],
+  "nfails": 3
+ },
+ "T5-A-r1": {
+  "run": "T5-A-r1",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 61,
+  "total": 61,
+  "fails": [],
+  "nfails": 0
+ },
+ "T1-B-r2": {
+  "run": "T1-B-r2",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 28,
+  "total": 28,
+  "fails": [],
+  "nfails": 0
+ },
+ "T1-A-r2": {
+  "run": "T1-A-r2",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 28,
+  "total": 28,
+  "fails": [],
+  "nfails": 0
+ },
+ "T2-B-r2": {
+  "run": "T2-B-r2",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 91,
+  "total": 91,
+  "fails": [],
+  "nfails": 0
+ },
+ "T3-B-r2": {
+  "run": "T3-B-r2",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 659,
+  "total": 659,
+  "fails": [],
+  "nfails": 0
+ },
+ "T2-A-r2": {
+  "run": "T2-A-r2",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 91,
+  "total": 91,
+  "fails": [],
+  "nfails": 0
+ },
+ "T3-A-r2": {
+  "run": "T3-A-r2",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 659,
+  "total": 659,
+  "fails": [],
+  "nfails": 0
+ },
+ "T4-A-r2": {
+  "run": "T4-A-r2",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 951,
+  "total": 951,
+  "fails": [],
+  "nfails": 0
+ },
+ "T4-B-r2": {
+  "run": "T4-B-r2",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 951,
+  "total": 951,
+  "fails": [],
+  "nfails": 0
+ },
+ "T5-A-r2": {
+  "run": "T5-A-r2",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 1.0,
+  "passed": 61,
+  "total": 61,
+  "fails": [],
+  "nfails": 0
+ },
+ "T5-B-r2": {
+  "run": "T5-B-r2",
+  "static": {
+   "ok": true,
+   "n": 0,
+   "issues": []
+  },
+  "import_ok": true,
+  "consoleErrors": [],
+  "score": 0.9508,
+  "passed": 58,
+  "total": 61,
+  "fails": [
+   "Sun: cc.DirectionalLight.illuminanceHDR 65000 != 80000",
+   "Lamps/FillLight: cc.SphereLight.luminanceHDR 1913.8445799108247 != 2000",
+   "Lamps/RimSpot: cc.SpotLight.luminanceHDR 1913.8445799108247 != 3000"
+  ],
+  "nfails": 3
+ }
+}

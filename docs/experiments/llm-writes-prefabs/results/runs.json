@@ -1,0 +1,334 @@
+[
+ {
+  "run": "T1-A-r1",
+  "score": 1.0,
+  "passed": 28,
+  "total": 28,
+  "static_ok": true,
+  "tool_calls": 9,
+  "import_cmds": 1,
+  "method": "hand-written",
+  "generator": [],
+  "gen_lines": 0,
+  "prefab_objects": 13,
+  "prefab_bytes": 4688,
+  "legacy_light_fields": null
+ },
+ {
+  "run": "T1-A-r2",
+  "score": 1.0,
+  "passed": 28,
+  "total": 28,
+  "static_ok": true,
+  "tool_calls": 8,
+  "import_cmds": 1,
+  "method": "hand-written",
+  "generator": [],
+  "gen_lines": 0,
+  "prefab_objects": 13,
+  "prefab_bytes": 4697,
+  "legacy_light_fields": null
+ },
+ {
+  "run": "T1-B-r1",
+  "score": 1.0,
+  "passed": 28,
+  "total": 28,
+  "static_ok": true,
+  "tool_calls": 8,
+  "import_cmds": 1,
+  "method": "hand-written",
+  "generator": [],
+  "gen_lines": 0,
+  "prefab_objects": 13,
+  "prefab_bytes": 5473,
+  "legacy_light_fields": null
+ },
+ {
+  "run": "T1-B-r2",
+  "score": 1.0,
+  "passed": 28,
+  "total": 28,
+  "static_ok": true,
+  "tool_calls": 7,
+  "import_cmds": 1,
+  "method": "hand-written",
+  "generator": [],
+  "gen_lines": 0,
+  "prefab_objects": 13,
+  "prefab_bytes": 5317,
+  "legacy_light_fields": null
+ },
+ {
+  "run": "T2-A-r1",
+  "score": 1.0,
+  "passed": 91,
+  "total": 91,
+  "static_ok": true,
+  "tool_calls": 9,
+  "import_cmds": 1,
+  "method": "script",
+  "generator": [
+   "gen_itemslot.py"
+  ],
+  "gen_lines": 215,
+  "prefab_objects": 43,
+  "prefab_bytes": 16804,
+  "legacy_light_fields": null
+ },
+ {
+  "run": "T2-A-r2",
+  "score": 1.0,
+  "passed": 91,
+  "total": 91,
+  "static_ok": true,
+  "tool_calls": 11,
+  "import_cmds": 1,
+  "method": "script",
+  "generator": [
+   "gen_itemslot.py"
+  ],
+  "gen_lines": 140,
+  "prefab_objects": 43,
+  "prefab_bytes": 16269,
+  "legacy_light_fields": null
+ },
+ {
+  "run": "T2-B-r1",
+  "score": 1.0,
+  "passed": 91,
+  "total": 91,
+  "static_ok": true,
+  "tool_calls": 9,
+  "import_cmds": 1,
+  "method": "script",
+  "generator": [
+   "gen-itemslot.js"
+  ],
+  "gen_lines": 205,
+  "prefab_objects": 43,
+  "prefab_bytes": 18258,
+  "legacy_light_fields": null
+ },
+ {
+  "run": "T2-B-r2",
+  "score": 1.0,
+  "passed": 91,
+  "total": 91,
+  "static_ok": true,
+  "tool_calls": 8,
+  "import_cmds": 1,
+  "method": "script",
+  "generator": [
+   "gen_itemslot.py"
+  ],
+  "gen_lines": 240,
+  "prefab_objects": 43,
+  "prefab_bytes": 18233,
+  "legacy_light_fields": null
+ },
+ {
+  "run": "T3-A-r1",
+  "score": 1.0,
+  "passed": 659,
+  "total": 659,
+  "static_ok": true,
+  "tool_calls": 17,
+  "import_cmds": 1,
+  "method": "script",
+  "generator": [
+   "gen_bagdialog.py"
+  ],
+  "gen_lines": 263,
+  "prefab_objects": 303,
+  "prefab_bytes": 121271,
+  "legacy_light_fields": null
+ },
+ {
+  "run": "T3-A-r2",
+  "score": 1.0,
+  "passed": 659,
+  "total": 659,
+  "static_ok": true,
+  "tool_calls": 13,
+  "import_cmds": 1,
+  "method": "script",
+  "generator": [
+   "gen_bagdialog.py"
+  ],
+  "gen_lines": 286,
+  "prefab_objects": 303,
+  "prefab_bytes": 129495,
+  "legacy_light_fields": null
+ },
+ {
+  "run": "T3-B-r1",
+  "score": 1.0,
+  "passed": 659,
+  "total": 659,
+  "static_ok": true,
+  "tool_calls": 9,
+  "import_cmds": 1,
+  "method": "script",
+  "generator": [
+   "gen_bag_dialog.py"
+  ],
+  "gen_lines": 286,
+  "prefab_objects": 303,
+  "prefab_bytes": 129502,
+  "legacy_light_fields": null
+ },
+ {
+  "run": "T3-B-r2",
+  "score": 1.0,
+  "passed": 659,
+  "total": 659,
+  "static_ok": true,
+  "tool_calls": 9,
+  "import_cmds": 1,
+  "method": "script",
+  "generator": [
+   "gen_bagdialog.py"
+  ],
+  "gen_lines": 268,
+  "prefab_objects": 303,
+  "prefab_bytes": 129495,
+  "legacy_light_fields": null
+ },
+ {
+  "run": "T4-A-r1",
+  "score": 1.0,
+  "passed": 951,
+  "total": 951,
+  "static_ok": true,
+  "tool_calls": 12,
+  "import_cmds": 1,
+  "method": "script",
+  "generator": [
+   "gen_battle_screen.py"
+  ],
+  "gen_lines": 175,
+  "prefab_objects": 445,
+  "prefab_bytes": 171118,
+  "legacy_light_fields": null
+ },
+ {
+  "run": "T4-A-r2",
+  "score": 1.0,
+  "passed": 951,
+  "total": 951,
+  "static_ok": true,
+  "tool_calls": 14,
+  "import_cmds": 1,
+  "method": "script",
+  "generator": [
+   "gen_battle_prefab.js"
+  ],
+  "gen_lines": 165,
+  "prefab_objects": 445,
+  "prefab_bytes": 177576,
+  "legacy_light_fields": null
+ },
+ {
+  "run": "T4-B-r1",
+  "score": 1.0,
+  "passed": 951,
+  "total": 951,
+  "static_ok": true,
+  "tool_calls": 12,
+  "import_cmds": 1,
+  "method": "script",
+  "generator": [
+   "gen_battle_prefab.py"
+  ],
+  "gen_lines": 269,
+  "prefab_objects": 445,
+  "prefab_bytes": 192176,
+  "legacy_light_fields": null
+ },
+ {
+  "run": "T4-B-r2",
+  "score": 1.0,
+  "passed": 951,
+  "total": 951,
+  "static_ok": true,
+  "tool_calls": 12,
+  "import_cmds": 1,
+  "method": "script",
+  "generator": [
+   "gen_battle_prefab.js"
+  ],
+  "gen_lines": 145,
+  "prefab_objects": 445,
+  "prefab_bytes": 179261,
+  "legacy_light_fields": null
+ },
+ {
+  "run": "T5-A-r1",
+  "score": 1.0,
+  "passed": 61,
+  "total": 61,
+  "static_ok": true,
+  "tool_calls": 18,
+  "import_cmds": 4,
+  "method": "script",
+  "generator": [
+   "gen_lightrig.py"
+  ],
+  "gen_lines": 233,
+  "prefab_objects": 25,
+  "prefab_bytes": 12720,
+  "legacy_light_fields": true
+ },
+ {
+  "run": "T5-A-r2",
+  "score": 1.0,
+  "passed": 61,
+  "total": 61,
+  "static_ok": true,
+  "tool_calls": 14,
+  "import_cmds": 1,
+  "method": "script",
+  "generator": [
+   "gen_lightrig.py"
+  ],
+  "gen_lines": 228,
+  "prefab_objects": 25,
+  "prefab_bytes": 12821,
+  "legacy_light_fields": true
+ },
+ {
+  "run": "T5-B-r1",
+  "score": 0.9508,
+  "passed": 58,
+  "total": 61,
+  "static_ok": true,
+  "tool_calls": 8,
+  "import_cmds": 1,
+  "method": "script",
+  "generator": [
+   "gen_lightrig.py"
+  ],
+  "gen_lines": 177,
+  "prefab_objects": 25,
+  "prefab_bytes": 11585,
+  "legacy_light_fields": false
+ },
+ {
+  "run": "T5-B-r2",
+  "score": 0.9508,
+  "passed": 58,
+  "total": 61,
+  "static_ok": true,
+  "tool_calls": 12,
+  "import_cmds": 1,
+  "method": "script",
+  "generator": [
+   "gen_lightrig.py"
+  ],
+  "gen_lines": 210,
+  "prefab_objects": 25,
+  "prefab_bytes": 12346,
+  "legacy_light_fields": false
+ }
+]

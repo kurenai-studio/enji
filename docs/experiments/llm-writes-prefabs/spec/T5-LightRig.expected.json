@@ -1,0 +1,346 @@
+[
+ {
+  "path": "",
+  "parent": null,
+  "children": [
+   "Sun",
+   "Lamps",
+   "Probes",
+   "Reflection"
+  ],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 1073741824,
+  "ui": null,
+  "comps": []
+ },
+ {
+  "path": "Sun",
+  "parent": "",
+  "children": [],
+  "pos": [
+   0,
+   10,
+   0
+  ],
+  "quat": [
+   -0.40821789367673483,
+   0.23456971600980447,
+   0.109381654946615,
+   0.875426098065593
+  ],
+  "euler": [
+   -50,
+   30,
+   0
+  ],
+  "layer": 1073741824,
+  "ui": null,
+  "comps": [
+   {
+    "type": "cc.DirectionalLight",
+    "color": [
+     255,
+     244,
+     214,
+     255
+    ],
+    "illuminanceHDR": 80000,
+    "shadowEnabled": true
+   }
+  ]
+ },
+ {
+  "path": "Lamps",
+  "parent": "",
+  "children": [
+   "FillLight",
+   "RimSpot"
+  ],
+  "pos": [
+   0,
+   0,
+   -1
+  ],
+  "quat": [
+   0.0,
+   0.7071067811865475,
+   0.0,
+   0.7071067811865476
+  ],
+  "euler": [
+   0,
+   90,
+   0
+  ],
+  "layer": 1073741824,
+  "ui": null,
+  "comps": []
+ },
+ {
+  "path": "Lamps/FillLight",
+  "parent": "Lamps",
+  "children": [],
+  "pos": [
+   3,
+   2,
+   -2
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 1073741824,
+  "ui": null,
+  "comps": [
+   {
+    "type": "cc.SphereLight",
+    "color": [
+     120,
+     160,
+     255,
+     255
+    ],
+    "luminanceHDR": 2000,
+    "size": 0.5,
+    "range": 6
+   }
+  ]
+ },
+ {
+  "path": "Lamps/RimSpot",
+  "parent": "Lamps",
+  "children": [],
+  "pos": [
+   -4,
+   5,
+   4
+  ],
+  "quat": [
+   -0.27781593346944056,
+   -0.36497167621709875,
+   -0.11507512748638375,
+   0.8811195706053617
+  ],
+  "euler": [
+   -35,
+   -45,
+   0
+  ],
+  "layer": 1073741824,
+  "ui": null,
+  "comps": [
+   {
+    "type": "cc.SpotLight",
+    "color": [
+     255,
+     120,
+     80,
+     255
+    ],
+    "luminanceHDR": 3000,
+    "size": 0.2,
+    "range": 12,
+    "spotAngle": 40
+   }
+  ]
+ },
+ {
+  "path": "Probes",
+  "parent": "",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 1073741824,
+  "ui": null,
+  "comps": [
+   {
+    "type": "cc.LightProbeGroup",
+    "method": 0,
+    "minPos": [
+     -4,
+     0,
+     -4
+    ],
+    "maxPos": [
+     4,
+     3,
+     4
+    ],
+    "nProbes": [
+     3,
+     2,
+     3
+    ],
+    "probes": [
+     [
+      -4,
+      0,
+      -4
+     ],
+     [
+      0,
+      0,
+      -4
+     ],
+     [
+      4,
+      0,
+      -4
+     ],
+     [
+      -4,
+      0,
+      0
+     ],
+     [
+      0,
+      0,
+      0
+     ],
+     [
+      4,
+      0,
+      0
+     ],
+     [
+      -4,
+      0,
+      4
+     ],
+     [
+      0,
+      0,
+      4
+     ],
+     [
+      4,
+      0,
+      4
+     ],
+     [
+      -4,
+      3,
+      -4
+     ],
+     [
+      0,
+      3,
+      -4
+     ],
+     [
+      4,
+      3,
+      -4
+     ],
+     [
+      -4,
+      3,
+      0
+     ],
+     [
+      0,
+      3,
+      0
+     ],
+     [
+      4,
+      3,
+      0
+     ],
+     [
+      -4,
+      3,
+      4
+     ],
+     [
+      0,
+      3,
+      4
+     ],
+     [
+      4,
+      3,
+      4
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Reflection",
+  "parent": "",
+  "children": [],
+  "pos": [
+   0,
+   1.5,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 1073741824,
+  "ui": null,
+  "comps": [
+   {
+    "type": "cc.ReflectionProbe",
+    "probeType": 0,
+    "resolution": 256,
+    "size": [
+     5,
+     1.5,
+     5
+    ],
+    "backgroundColor": [
+     20,
+     24,
+     32,
+     255
+    ]
+   }
+  ]
+ }
+]

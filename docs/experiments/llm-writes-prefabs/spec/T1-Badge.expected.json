@@ -1,0 +1,92 @@
+[
+ {
+  "path": "",
+  "parent": null,
+  "children": [
+   "Text"
+  ],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 248,
+   "h": 80,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "1770805b-7c6a-4ebc-bc74-fa08164c683b@f9941",
+    "spriteType": 0,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Text",
+  "parent": "",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 200,
+   "h": 50,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Label",
+    "string": "LV 16",
+    "fontSize": 32,
+    "lineHeight": 40,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ],
+    "bold": true,
+    "hAlign": 1,
+    "vAlign": 1,
+    "overflow": 2
+   }
+  ]
+ }
+]
