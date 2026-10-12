@@ -13,8 +13,10 @@ Creator 3.8.8 IDE (or a separate build MCP).
 - Prefabs go under `assets/resources/prefabs/`, materials under
   `assets/resources/materials/`, other files (images, audio) under `assets/resources/`.
 - Do not edit `assets/enji/Boot.ts` or `*.scene`.
-- Never write or edit `.meta` files by hand. `enji import` creates them and
-  **keeps importer `ver` on Creator 3.8.8 gold**.
+- Never create a `.meta` file or change its `uuid`, `ver`, `importer` or
+  `subMetas` keys. `enji import` creates them and **keeps importer `ver` on
+  Creator 3.8.8 gold**. Importer settings under `userData` are yours to edit, as
+  in Creator's inspector (see "Importer settings" below).
 - `assets/enji/helpers.ts` holds small helpers (`loadPrefab`, canvas, labels).
 
 ## `@ccclass` reserved names
@@ -33,6 +35,27 @@ Prefer unique names like `MainView`, `EnemyView`.
 - A prefab must not reference another prefab. Compose in code.
 - Prefer handwritten minimal prefabs; the importer may reformat them.
 
+### Writing prefabs
+
+Write whole prefabs (a HUD screen, a dialog, a 3D stage with its lights) as
+`.prefab` JSON; code loads, instantiates and binds them instead of building
+nodes with `new Node` / `addComponent`. For more than a few nodes, write a small
+generator script outside `assets/` that emits the JSON and assigns the
+`__id__`s. Reference an image as `{"__uuid__": "<uuid>@f9941", "__expectedType__": "cc.SpriteFrame"}`.
+
+`enji import` and `enji check` do not validate field names: a misspelled or
+outdated field silently keeps the engine default. Known cases:
+
+- Light intensity is read from the legacy names. Write both `_illuminance` and
+  `_illuminanceHDR` (DirectionalLight), both `_luminance` and `_luminanceHDR`
+  (SphereLight, SpotLight).
+- A Label with `Overflow.NONE` resets its node width to the text size when it
+  enters the scene; use `SHRINK` or `CLAMP` for fixed boxes.
+
+So check each new prefab at runtime: instantiate it in the preview and log the
+component values you set. See `docs/experiments/llm-writes-prefabs` in the
+Enji repository for the measurement behind this section.
+
 ## Importing files and getting uuids
 
 After you create or change files under `assets/`, import them. This writes the
@@ -46,6 +69,16 @@ enji import assets/resources/images                   # a whole folder
 Returns `{ ok, imported, failed, assets: [{ ok, path, uuid, type, importer, subAssets }] }`.
 Sub-assets carry their own uuid (e.g. an image's `spriteFrame` is `<uuid>@f9941`).
 A non-zero `failed` means the file content was rejected; fix the file and import again.
+
+### Importer settings
+
+Settings Creator shows in the asset inspector live in the `.meta` `userData`.
+Edit the value in place, then `enji import` the asset (not the `.meta`) so the
+host re-imports it. For example, 9-slice borders of an image are
+`subMetas.f9941.userData.borderLeft / borderTop / borderRight / borderBottom`,
+in texture pixels; a `cc.Sprite` with type SLICED uses them. Borders and sprite
+sizes are texture pixels, so art exported at 2x density draws borders twice as
+thick unless the UI is scaled by 0.5 or the art is exported at 1x.
 
 To look up a file that is already imported, without importing:
 
@@ -75,6 +108,8 @@ gone (delete them). It does **not** run a full TypeScript publish build.
 
 When a 3D view looks wrong, check `enji logs --errors` **before** redesigning
 art. Several failure modes look like “bad visuals” but are hard runtime errors.
+Error entries carry `source` (the first stack frame mapped to `assets/…ts:line`)
+and stack lines in `detail` already point at your TypeScript files.
 
 Engine modules (Spine, DragonBones, TiledMap, physics backend, …) come from
 `settings/v2/packages/engine.json`, i.e. Creator 3.8.8 Project Settings →
@@ -88,7 +123,11 @@ means a preview page booted and no current errors remain. `clean: false` with
 `previewPage: "none"` means no browser page has run since `host start` (not
 opened yet, or the tab still shows a connection error from the restart): open or
 reload the `previewUrl` and ask again. The port is not fixed; always take the URL
-from `enji host start` / `enji host status`.
+from `enji host start` / `enji host status`. Every open preview tab logs into the
+same buffer; `openPages` counts them and browser entries carry `page`. Close
+extra tabs when the output looks duplicated. An `asset-error` stays until the
+same path imports successfully: fix the file, then run `enji import <path>`
+again (a page reload does not clear it).
 
 ## 3D scenes: cameras vs Canvas
 
@@ -99,65 +138,56 @@ the Canvas camera alone, the 3D frame is wiped every frame → **black screen**
 
 When adding a 3D camera:
 
-1. Game camera: `clearFlags = SOLID_COLOR` (or SKYBOX), lower `priority`.
-2. Every other camera (Canvas / UI): `clearFlags = DEPTH_ONLY`, higher `priority`.
+1. Game camera: `clearFlags = SOLID_COLOR` (or SKYBOX), lower `priority`,
+   `visibility = Layers.Enum.DEFAULT`.
+2. Every other camera (Canvas / UI): `clearFlags = DEPTH_ONLY`, higher `priority`,
+   `visibility = Layers.Enum.UI_2D`. The template Canvas camera's visibility
+   also includes `DEFAULT`, so without this it draws every 3D mesh a second
+   time, orthographically, on top of the scene (large meshes show up as flat
+   discs or slabs over the view).
 3. Prefer `ensureCanvas()` from `assets/enji/helpers.ts` for new UI cameras —
-   it already sets `DEPTH_ONLY`. Still fix any **existing** scene Canvas camera.
+   it already sets `DEPTH_ONLY` and `UI_2D`. Still fix any **existing** scene Canvas camera.
 
 ```ts
 for (const cam of scene.getComponentsInChildren(Camera)) {
     if (cam.node.name === 'PlayerCamera') continue;
     cam.clearFlags = Camera.ClearFlag.DEPTH_ONLY;
+    cam.visibility = Layers.Enum.UI_2D;
+    cam.priority = 1 << 30; // the template camera's priority is 0, same as a new game camera
 }
 ```
 
-## Runtime materials (Enji preview)
+## Materials, lighting and custom shaders
 
-Enji preview is a 4.0 host with a **thin** builtin effect set. Do **not** assume
-Creator IDE defaults are all registered.
+Full guide with verified capabilities and recipes: `docs/rendering.md` in the
+Enji package (`enji context` prints the docs folder). Short version:
 
-Verified available for runtime `Material.initialize({ effectName })` in preview:
-
-- `builtin-unlit` (primary for code-built meshes)
-- `legacy/terrain`, a few `util/*` / pipeline helpers
-
-**Not** registered in preview (common agent mistake):
-
-- `builtin-standard` / PBR lit materials
-
-Symptoms when the effect is missing or defines did not apply:
+- Start 3D work with `enji init <dir> --3d`: 3d modules, camera, shadowed
+  directional light, ambient light and `resources/materials/standard.mtl`
+  (`builtin-standard`, PBR) are set up.
+- Only `builtin-unlit` is registered at start. `builtin-standard`,
+  `builtin-toon` and `advanced/*` effects load on demand: reference them from a
+  `.mtl` under `resources/` (needed for Creator builds too) or call
+  `loadBuiltinEffect('builtin-standard')` from `assets/enji/helpers.ts`.
+  `EffectAsset.get(name)` is only non-null after something loaded the effect.
+- Custom `.effect` files under `assets/resources/effects/` work; load them with
+  `loadEffect('effects/<name>')`. A shader compiles when its material is first
+  used: GLSL errors then appear in `enji logs --errors` as one entry pointing at
+  the `.effect` line (they do not fail `enji import`).
+- Render textures are 8 bits per channel. Keep float simulation state on the
+  CPU and upload it with `createDataTexture(w, h, { float: true })`; use
+  `createTexturePass` for 8-bit passes (caustics, blurs).
+- Meshes rebuilt every frame: `utils.MeshUtils.createDynamicMesh` once, then
+  `updateDynamicMesh(renderer, geometry)`. A bare `mesh.updateSubMesh` keeps
+  drawing the old triangle count.
 
 | Log / crash | Meaning |
 |-------------|---------|
-| `illegal property name: mainTexture` (or roughness / metallic) | Effect resolved poorly, or `USE_TEXTURE` / `USE_ALBEDO_MAP` never applied — property not on the pass |
-| `Cannot read properties of undefined (reading 'localSetLayout')` on `setSharedMaterial` | Material passes broken; do not keep swapping materials — fix `effectName` / defines first |
+| `illegal property name: mainTexture` (or roughness / metallic) | The property is not on the pass: wrong effect, or its define (`USE_TEXTURE`, `USE_ALBEDO_MAP`) was not set |
+| `Cannot read properties of undefined (reading 'localSetLayout')` on `setSharedMaterial` | The material never initialized (effect missing or failed to compile); fix the effect before swapping materials |
 
-Preferred pattern for procedural / voxel / debug meshes:
-
-```ts
-const mat = new Material();
-mat.initialize({
-    effectName: 'builtin-unlit',
-    defines: { USE_TEXTURE: true, USE_VERTEX_COLOR: true },
-});
-mat.setProperty('mainTexture', atlas);
-mat.setProperty('mainColor', Color.WHITE);
-```
-
-Face lighting: bake shade into vertex `colors` (top ≈ 1.0, sides ≈ 0.7–0.9,
-bottom ≈ 0.5). Do not rely on `DirectionalLight` + `builtin-standard` in Enji
-preview.
-
-Before shipping a new effect name, confirm it exists:
-
-```ts
-!!EffectAsset.get('builtin-unlit') // true in preview
-!!EffectAsset.get('builtin-standard') // false in preview today
-```
-
-Imported model materials (from glTF / prefab under `resources/`) are a separate
-path — use `loadModel` / `replaceMaterials`; those assets carry their own
-effects and are not limited to the runtime `effectName` list above.
+Imported model materials (from glTF / prefab under `resources/`) carry their own
+effects; use `loadModel` / `replaceMaterials`.
 
 ## Build (not Enji)
 

@@ -1,0 +1,34 @@
+# Enji preview host in Docker; Cursor Agent stays on the host (macOS keychain).
+#
+#   cd enji && docker compose -f docker/compose.yml up --build
+#
+# Then on the host:
+#   agent -p --force --trust --workspace ../enji-demos/slots '用 enji 做…'
+
+services:
+  enji:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    platform: linux/arm64
+    image: enji:local
+    environment:
+      WATCH_POLL: "1"
+      WATCH_POLL_MS: "1000"
+      PORT: "7460"
+    volumes:
+      - ../../enji-demos/slots:/work
+    working_dir: /work
+    ports:
+      - "7460-7470:7460-7470"
+    # Init happens on the host (or via `docker compose run`); this service keeps
+    # the preview host running. sleep infinity keeps the container up after host
+    # start backgrounds itself.
+    command:
+      [
+        "sh",
+        "-c",
+        "node /enji/bin/enji.mjs host start --project /work && sleep infinity",
+      ]
+    stdin_open: true
+    tty: true

@@ -1,0 +1,2194 @@
+[
+ {
+  "path": "",
+  "parent": null,
+  "children": [
+   "Dim",
+   "Panel"
+  ],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 720,
+   "h": 1280,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.BlockInputEvents"
+   }
+  ]
+ },
+ {
+  "path": "Dim",
+  "parent": "",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 720,
+   "h": 1280,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "368d1a6f-889b-4f22-a503-a43b521bae45@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     0,
+     0,
+     0,
+     170
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel",
+  "parent": "",
+  "children": [
+   "TitlePlate",
+   "Close",
+   "Grid"
+  ],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 640,
+   "h": 820,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "5f891261-50c3-44a8-9a51-b3631db45a09@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/TitlePlate",
+  "parent": "Panel",
+  "children": [
+   "Title"
+  ],
+  "pos": [
+   0,
+   370,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 260,
+   "h": 72,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "1770805b-7c6a-4ebc-bc74-fa08164c683b@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/TitlePlate/Title",
+  "parent": "Panel/TitlePlate",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 240,
+   "h": 56,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Label",
+    "string": "道具袋",
+    "fontSize": 36,
+    "lineHeight": 45,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ],
+    "bold": true,
+    "hAlign": 1,
+    "vAlign": 1,
+    "overflow": 2
+   }
+  ]
+ },
+ {
+  "path": "Panel/Close",
+  "parent": "Panel",
+  "children": [
+   "X"
+  ],
+  "pos": [
+   276,
+   370,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 72,
+   "h": 72,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "1770805b-7c6a-4ebc-bc74-fa08164c683b@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   },
+   {
+    "type": "cc.Button",
+    "target": "Panel/Close",
+    "transition": 3,
+    "interactable": true,
+    "zoomScale": 0.9
+   }
+  ]
+ },
+ {
+  "path": "Panel/Close/X",
+  "parent": "Panel/Close",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 60,
+   "h": 60,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Label",
+    "string": "×",
+    "fontSize": 40,
+    "lineHeight": 50,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ],
+    "bold": true,
+    "hAlign": 1,
+    "vAlign": 1,
+    "overflow": 2
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid",
+  "parent": "Panel",
+  "children": [
+   "Slot0",
+   "Slot1",
+   "Slot2",
+   "Slot3",
+   "Slot4",
+   "Slot5"
+  ],
+  "pos": [
+   0,
+   -10,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 580,
+   "h": 520,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Layout",
+    "layoutType": 3,
+    "resizeMode": 0,
+    "cellW": 180,
+    "cellH": 240,
+    "startAxis": 0,
+    "spacingX": 20,
+    "spacingY": 40,
+    "padding": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "constraint": 2,
+    "constraintNum": 3,
+    "hDir": 0,
+    "vDir": 1
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot0",
+  "parent": "Panel/Grid",
+  "children": [
+   "Bg",
+   "Frame",
+   "Icon",
+   "Name",
+   "CountBadge"
+  ],
+  "pos": [
+   -200,
+   140,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Button",
+    "target": "Panel/Grid/Slot0",
+    "transition": 0,
+    "interactable": true
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot0/Bg",
+  "parent": "Panel/Grid/Slot0",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "8e6c85ea-f832-4128-b49a-16cb5c528e43@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot0/Frame",
+  "parent": "Panel/Grid/Slot0",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "71e411cb-08b2-4cc8-82c7-cc3a7693629c@f9941",
+    "spriteType": 0,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot0/Icon",
+  "parent": "Panel/Grid/Slot0",
+  "children": [],
+  "pos": [
+   0,
+   24,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 110,
+   "h": 110,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "09760ad1-a326-497a-b38a-1596b7cc4038@f9941",
+    "spriteType": 0,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot0/Name",
+  "parent": "Panel/Grid/Slot0",
+  "children": [],
+  "pos": [
+   0,
+   -70,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 170,
+   "h": 36,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Label",
+    "string": "回复药",
+    "fontSize": 26,
+    "lineHeight": 32,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ],
+    "bold": true,
+    "hAlign": 1,
+    "vAlign": 1,
+    "overflow": 2
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot0/CountBadge",
+  "parent": "Panel/Grid/Slot0",
+  "children": [
+   "Count"
+  ],
+  "pos": [
+   54,
+   98,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 72,
+   "h": 36,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "1770805b-7c6a-4ebc-bc74-fa08164c683b@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot0/CountBadge/Count",
+  "parent": "Panel/Grid/Slot0/CountBadge",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 64,
+   "h": 30,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Label",
+    "string": "x3",
+    "fontSize": 22,
+    "lineHeight": 28,
+    "color": [
+     17,
+     17,
+     17,
+     255
+    ],
+    "bold": true,
+    "hAlign": 1,
+    "vAlign": 1,
+    "overflow": 2
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot1",
+  "parent": "Panel/Grid",
+  "children": [
+   "Bg",
+   "Frame",
+   "Icon",
+   "Name",
+   "CountBadge"
+  ],
+  "pos": [
+   0,
+   140,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Button",
+    "target": "Panel/Grid/Slot1",
+    "transition": 0,
+    "interactable": true
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot1/Bg",
+  "parent": "Panel/Grid/Slot1",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "8e6c85ea-f832-4128-b49a-16cb5c528e43@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot1/Frame",
+  "parent": "Panel/Grid/Slot1",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "71e411cb-08b2-4cc8-82c7-cc3a7693629c@f9941",
+    "spriteType": 0,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot1/Icon",
+  "parent": "Panel/Grid/Slot1",
+  "children": [],
+  "pos": [
+   0,
+   24,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 110,
+   "h": 110,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "81d3f036-8c39-4b1a-a067-970878f6fb6b@f9941",
+    "spriteType": 0,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot1/Name",
+  "parent": "Panel/Grid/Slot1",
+  "children": [],
+  "pos": [
+   0,
+   -70,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 170,
+   "h": 36,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Label",
+    "string": "大回复药",
+    "fontSize": 26,
+    "lineHeight": 32,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ],
+    "bold": true,
+    "hAlign": 1,
+    "vAlign": 1,
+    "overflow": 2
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot1/CountBadge",
+  "parent": "Panel/Grid/Slot1",
+  "children": [
+   "Count"
+  ],
+  "pos": [
+   54,
+   98,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 72,
+   "h": 36,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "1770805b-7c6a-4ebc-bc74-fa08164c683b@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot1/CountBadge/Count",
+  "parent": "Panel/Grid/Slot1/CountBadge",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 64,
+   "h": 30,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Label",
+    "string": "x1",
+    "fontSize": 22,
+    "lineHeight": 28,
+    "color": [
+     17,
+     17,
+     17,
+     255
+    ],
+    "bold": true,
+    "hAlign": 1,
+    "vAlign": 1,
+    "overflow": 2
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot2",
+  "parent": "Panel/Grid",
+  "children": [
+   "Bg",
+   "Frame",
+   "Icon",
+   "Name",
+   "CountBadge"
+  ],
+  "pos": [
+   200,
+   140,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Button",
+    "target": "Panel/Grid/Slot2",
+    "transition": 0,
+    "interactable": true
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot2/Bg",
+  "parent": "Panel/Grid/Slot2",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "8e6c85ea-f832-4128-b49a-16cb5c528e43@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot2/Frame",
+  "parent": "Panel/Grid/Slot2",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "71e411cb-08b2-4cc8-82c7-cc3a7693629c@f9941",
+    "spriteType": 0,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot2/Icon",
+  "parent": "Panel/Grid/Slot2",
+  "children": [],
+  "pos": [
+   0,
+   24,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 110,
+   "h": 110,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "09760ad1-a326-497a-b38a-1596b7cc4038@f9941",
+    "spriteType": 0,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot2/Name",
+  "parent": "Panel/Grid/Slot2",
+  "children": [],
+  "pos": [
+   0,
+   -70,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 170,
+   "h": 36,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Label",
+    "string": "解毒剂",
+    "fontSize": 26,
+    "lineHeight": 32,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ],
+    "bold": true,
+    "hAlign": 1,
+    "vAlign": 1,
+    "overflow": 2
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot2/CountBadge",
+  "parent": "Panel/Grid/Slot2",
+  "children": [
+   "Count"
+  ],
+  "pos": [
+   54,
+   98,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 72,
+   "h": 36,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "1770805b-7c6a-4ebc-bc74-fa08164c683b@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot2/CountBadge/Count",
+  "parent": "Panel/Grid/Slot2/CountBadge",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 64,
+   "h": 30,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Label",
+    "string": "x5",
+    "fontSize": 22,
+    "lineHeight": 28,
+    "color": [
+     17,
+     17,
+     17,
+     255
+    ],
+    "bold": true,
+    "hAlign": 1,
+    "vAlign": 1,
+    "overflow": 2
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot3",
+  "parent": "Panel/Grid",
+  "children": [
+   "Bg",
+   "Frame",
+   "Icon",
+   "Name",
+   "CountBadge"
+  ],
+  "pos": [
+   -200,
+   -140,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Button",
+    "target": "Panel/Grid/Slot3",
+    "transition": 0,
+    "interactable": true
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot3/Bg",
+  "parent": "Panel/Grid/Slot3",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "8e6c85ea-f832-4128-b49a-16cb5c528e43@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot3/Frame",
+  "parent": "Panel/Grid/Slot3",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "71e411cb-08b2-4cc8-82c7-cc3a7693629c@f9941",
+    "spriteType": 0,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot3/Icon",
+  "parent": "Panel/Grid/Slot3",
+  "children": [],
+  "pos": [
+   0,
+   24,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 110,
+   "h": 110,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "81d3f036-8c39-4b1a-a067-970878f6fb6b@f9941",
+    "spriteType": 0,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot3/Name",
+  "parent": "Panel/Grid/Slot3",
+  "children": [],
+  "pos": [
+   0,
+   -70,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 170,
+   "h": 36,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Label",
+    "string": "怪谈球",
+    "fontSize": 26,
+    "lineHeight": 32,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ],
+    "bold": true,
+    "hAlign": 1,
+    "vAlign": 1,
+    "overflow": 2
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot3/CountBadge",
+  "parent": "Panel/Grid/Slot3",
+  "children": [
+   "Count"
+  ],
+  "pos": [
+   54,
+   98,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 72,
+   "h": 36,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "1770805b-7c6a-4ebc-bc74-fa08164c683b@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot3/CountBadge/Count",
+  "parent": "Panel/Grid/Slot3/CountBadge",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 64,
+   "h": 30,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Label",
+    "string": "x12",
+    "fontSize": 22,
+    "lineHeight": 28,
+    "color": [
+     17,
+     17,
+     17,
+     255
+    ],
+    "bold": true,
+    "hAlign": 1,
+    "vAlign": 1,
+    "overflow": 2
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot4",
+  "parent": "Panel/Grid",
+  "children": [
+   "Bg",
+   "Frame",
+   "Icon",
+   "Name",
+   "CountBadge"
+  ],
+  "pos": [
+   0,
+   -140,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Button",
+    "target": "Panel/Grid/Slot4",
+    "transition": 0,
+    "interactable": true
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot4/Bg",
+  "parent": "Panel/Grid/Slot4",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "8e6c85ea-f832-4128-b49a-16cb5c528e43@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot4/Frame",
+  "parent": "Panel/Grid/Slot4",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "71e411cb-08b2-4cc8-82c7-cc3a7693629c@f9941",
+    "spriteType": 0,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot4/Icon",
+  "parent": "Panel/Grid/Slot4",
+  "children": [],
+  "pos": [
+   0,
+   24,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 110,
+   "h": 110,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "09760ad1-a326-497a-b38a-1596b7cc4038@f9941",
+    "spriteType": 0,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot4/Name",
+  "parent": "Panel/Grid/Slot4",
+  "children": [],
+  "pos": [
+   0,
+   -70,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 170,
+   "h": 36,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Label",
+    "string": "烟雾弹",
+    "fontSize": 26,
+    "lineHeight": 32,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ],
+    "bold": true,
+    "hAlign": 1,
+    "vAlign": 1,
+    "overflow": 2
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot4/CountBadge",
+  "parent": "Panel/Grid/Slot4",
+  "children": [
+   "Count"
+  ],
+  "pos": [
+   54,
+   98,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 72,
+   "h": 36,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "1770805b-7c6a-4ebc-bc74-fa08164c683b@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot4/CountBadge/Count",
+  "parent": "Panel/Grid/Slot4/CountBadge",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 64,
+   "h": 30,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Label",
+    "string": "x2",
+    "fontSize": 22,
+    "lineHeight": 28,
+    "color": [
+     17,
+     17,
+     17,
+     255
+    ],
+    "bold": true,
+    "hAlign": 1,
+    "vAlign": 1,
+    "overflow": 2
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot5",
+  "parent": "Panel/Grid",
+  "children": [
+   "Bg",
+   "Frame",
+   "Icon",
+   "Name",
+   "CountBadge"
+  ],
+  "pos": [
+   200,
+   -140,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Button",
+    "target": "Panel/Grid/Slot5",
+    "transition": 0,
+    "interactable": true
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot5/Bg",
+  "parent": "Panel/Grid/Slot5",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "8e6c85ea-f832-4128-b49a-16cb5c528e43@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot5/Frame",
+  "parent": "Panel/Grid/Slot5",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "71e411cb-08b2-4cc8-82c7-cc3a7693629c@f9941",
+    "spriteType": 0,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot5/Icon",
+  "parent": "Panel/Grid/Slot5",
+  "children": [],
+  "pos": [
+   0,
+   24,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 110,
+   "h": 110,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "81d3f036-8c39-4b1a-a067-970878f6fb6b@f9941",
+    "spriteType": 0,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot5/Name",
+  "parent": "Panel/Grid/Slot5",
+  "children": [],
+  "pos": [
+   0,
+   -70,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 170,
+   "h": 36,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Label",
+    "string": "复活草",
+    "fontSize": 26,
+    "lineHeight": 32,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ],
+    "bold": true,
+    "hAlign": 1,
+    "vAlign": 1,
+    "overflow": 2
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot5/CountBadge",
+  "parent": "Panel/Grid/Slot5",
+  "children": [
+   "Count"
+  ],
+  "pos": [
+   54,
+   98,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 72,
+   "h": 36,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "1770805b-7c6a-4ebc-bc74-fa08164c683b@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Panel/Grid/Slot5/CountBadge/Count",
+  "parent": "Panel/Grid/Slot5/CountBadge",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 64,
+   "h": 30,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Label",
+    "string": "x1",
+    "fontSize": 22,
+    "lineHeight": 28,
+    "color": [
+     17,
+     17,
+     17,
+     255
+    ],
+    "bold": true,
+    "hAlign": 1,
+    "vAlign": 1,
+    "overflow": 2
+   }
+  ]
+ }
+]

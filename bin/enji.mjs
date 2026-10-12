@@ -2,7 +2,7 @@
 /**
  * Enji CLI — Creator 3.8 preview / edit (no publish).
  *
- *   enji init <dir> [--template base-ai]
+ *   enji init <dir> [--3d | --template base-ai|base-3d]
  *   enji open [--project <dir>]
  *   enji host start|status|stop [--project <dir>] [--timeout <seconds>]
  *   enji import <file|dir>... [--project <dir>]
@@ -28,7 +28,7 @@ const USAGE = `enji ${VERSION}
 
 usage:
   enji --version
-  enji init <dir> [--template base-ai]
+  enji init <dir> [--3d | --template base-ai|base-3d]
   enji open [--project <dir>]
   enji host start|status|stop [--project <dir>] [--timeout <seconds>]
   enji import <file|dir>... [--project <dir>]
@@ -37,6 +37,8 @@ usage:
   enji check [--project <dir>]
   enji context [--project <dir>]
 
+init        creates a project from a template. --3d (template base-3d) enables the
+            3d + primitive engine modules and starts with a lit 3D scene.
 import      import new or changed files under assets/ and write their .meta
             (starts the host if needed); returns uuid / type / sub-assets.
 asset info  read uuid / importer / sub-assets from an existing .meta
@@ -197,7 +199,7 @@ async function main() {
   if (group === 'init' && command) {
     const { EnjiProjectControl } = await import('../lib/index.js');
     const control = new EnjiProjectControl();
-    const template = typeof options.template === 'string' ? options.template : 'base-ai';
+    const template = typeof options.template === 'string' ? options.template : options['3d'] ? 'base-3d' : 'base-ai';
     const project = await control.initialize(resolve(command), template);
     print({ ok: true, project, note: 'no publish; build in Creator 3.8.8 IDE' });
     return;

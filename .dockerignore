@@ -1,0 +1,11 @@
+# Patterns that must not enter the Docker build context for Enji.
+node_modules
+.git
+coverage
+temp
+*.tsbuildinfo
+.DS_Store
+test
+src
+issues
+examples

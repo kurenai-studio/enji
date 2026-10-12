@@ -1,0 +1,306 @@
+[
+ {
+  "path": "",
+  "parent": null,
+  "children": [
+   "Bg",
+   "Frame",
+   "Icon",
+   "Name",
+   "CountBadge"
+  ],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 200,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Button",
+    "target": "",
+    "transition": 0,
+    "interactable": true
+   }
+  ]
+ },
+ {
+  "path": "Bg",
+  "parent": "",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 200,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "8e6c85ea-f832-4128-b49a-16cb5c528e43@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Frame",
+  "parent": "",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 200,
+   "h": 240,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "71e411cb-08b2-4cc8-82c7-cc3a7693629c@f9941",
+    "spriteType": 0,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Icon",
+  "parent": "",
+  "children": [],
+  "pos": [
+   0,
+   24,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 120,
+   "h": 120,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "09760ad1-a326-497a-b38a-1596b7cc4038@f9941",
+    "spriteType": 0,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "Name",
+  "parent": "",
+  "children": [],
+  "pos": [
+   0,
+   -70,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 180,
+   "h": 36,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Label",
+    "string": "回复药",
+    "fontSize": 26,
+    "lineHeight": 32,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ],
+    "bold": true,
+    "hAlign": 1,
+    "vAlign": 1,
+    "overflow": 2
+   }
+  ]
+ },
+ {
+  "path": "CountBadge",
+  "parent": "",
+  "children": [
+   "Count"
+  ],
+  "pos": [
+   62,
+   98,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 72,
+   "h": 36,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Sprite",
+    "frame": "1770805b-7c6a-4ebc-bc74-fa08164c683b@f9941",
+    "spriteType": 1,
+    "sizeMode": 0,
+    "color": [
+     255,
+     255,
+     255,
+     255
+    ]
+   }
+  ]
+ },
+ {
+  "path": "CountBadge/Count",
+  "parent": "CountBadge",
+  "children": [],
+  "pos": [
+   0,
+   0,
+   0
+  ],
+  "quat": [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "euler": [
+   0,
+   0,
+   0
+  ],
+  "layer": 33554432,
+  "ui": {
+   "w": 64,
+   "h": 30,
+   "ax": 0.5,
+   "ay": 0.5
+  },
+  "comps": [
+   {
+    "type": "cc.Label",
+    "string": "x3",
+    "fontSize": 22,
+    "lineHeight": 28,
+    "color": [
+     17,
+     17,
+     17,
+     255
+    ],
+    "bold": true,
+    "hAlign": 1,
+    "vAlign": 1,
+    "overflow": 2
+   }
+  ]
+ }
+]

@@ -29,7 +29,7 @@ If the repo is already cloned: `Read enji/docs/getting-started.md and follow it 
 
 ```text
 enji --version
-enji init <dir> [--template base-ai]
+enji init <dir> [--3d]          # --3d: lit 3D template
 enji open [--project <dir>]
 enji host start|status|stop [--project <dir>]
 enji import <file|dir>...      # import assets, write .meta, return uuids
@@ -40,6 +40,30 @@ enji context
 ```
 
 There is **no** `enji publish`.
+
+## Rendering
+
+[docs/rendering.md](docs/rendering.md) lists what the bundled renderer supports
+(custom effects, PBR, shadows, float data textures, 8-bit render textures,
+dynamic meshes) and the template helpers for each.
+
+Complete example projects live in a separate repository,
+[kurenai-studio/enji-demos](https://github.com/kurenai-studio/enji-demos), so
+installing Enji does not download them:
+
+- `pool-water`: a port of Evan Wallace's WebGL Water (height-field simulation,
+  ray-traced refraction and reflection, caustics, floating sphere).
+- `infinity-castle`: an endless fall through a procedural Infinity Castle
+  shaft (Blender-generated glTF blocks, pooled chunks, custom lantern lighting).
+- `slots`: Lucky Reels, a 3-reel slots game one-shot by Cursor CLI against an
+  Enji host running in Docker (`docker/`).
+
+## Docker
+
+[docker/README.md](docker/README.md) builds an `enji:local` image and runs the
+preview host with `WATCH_POLL=1` (needed for bind mounts). Cursor Agent stays
+on the host unless you provide `CURSOR_API_KEY` (macOS keychain tokens do not
+transfer into Linux containers).
 
 ## Meta contract
 
@@ -83,4 +107,5 @@ records the source commit and what was dropped.
 - [x] Meta downgrade on host write / check / import
 - [x] CLI: init / open / host / asset / logs / check — no publish
 - [x] 3.8 template + AGENTS (reserved `@ccclass`, IDE build)
+- [x] 3D template, custom shaders with errors mapped to `.effect` lines, stacks mapped to `.ts`
 - [x] Existing 3.8 open: detect, ccclass scan, meta not upgraded past gold
